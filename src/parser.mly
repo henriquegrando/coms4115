@@ -7,9 +7,11 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL VOID
+%token RETURN IF ELSE FOR WHILE
+%token INCLUDE TUPLE DOLLAR BREAK CONTINUE FUN IN
 %token <int> LITERAL
 %token <string> ID
+%token <string> TID
 %token EOF
 
 %nonassoc NOELSE
@@ -22,6 +24,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
+%nonassoc DOLLAR
 
 %start program
 %type <Ast.program> program

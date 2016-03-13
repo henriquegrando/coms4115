@@ -9,23 +9,21 @@ type uop = Neg | Not
 
 type tup = string * string list (* tuple creation *)
 
-type lhs = (* lhs *)
-    Var of string
-  | VarBrac of string * expr (* a[0] a[i] a[i+1] *)
-  | VarBrac2 of string * expr * expr (* a[0:2] *)
-  | VarAttr of string * string (* a$b *)
+type obj = (* lhs *)
+    Id of string
+  | Brac of string * expr (* a[0] a[i] a[i+1] *)
+  | Brac2 of string * expr * expr (* a[0:2] *)
+  | Attr of string * string (* a$b *)
 and
  expr =
     Literal of int
   | BoolLit of bool
   | FloatLit of float
   | StrLit of string
-  | Id of string
-  | Attr of string * string (* attribute of tuple or table *)
-  | Brac of string * expr (* as on lhs *)
+  | Obj of obj
   | Binop of expr * op * expr(* as on lhs *)
   | Unop of uop * expr
-  | Assign of lhs * expr
+  | Assign of obj * expr
   | Call of string * expr list
   | TupInst of string (* tuple instantiation *)
   | TabInst of string (* table instantiation e.g. Foo[] *)

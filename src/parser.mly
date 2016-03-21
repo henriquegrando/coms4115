@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA COLON
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE
@@ -36,36 +36,44 @@ program:
 
 decls:
    /* nothing */ { [], [] }
- | decls vdecl { ($2 :: fst $1), snd $1 }
- | decls fdecl { fst $1, ($2 :: snd $1) }
+ | decls stmt { ($2 :: fst $1), snd $1 }
+ | decls tdecl_or_fdecl { fst $1, ($2 :: snd $1) }
+
+tdecl_or_fdecl:
+    fdecl { $1 }
+  | tdecl { $1 }
 
 fdecl:
-   typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-     { { typ = $1;
-	 fname = $2;
+  FUN ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+     { Func({ fname = $2;
 	 formals = $4;
-	 locals = List.rev $7;
-	 body = List.rev $8 } }
+	 locals = [];
+	 body = List.rev $7 }) }
+
+tdecl:
+  TUPLE TID LBRACE formal_list RBRACE { Tup($2, $4) }
 
 formals_opt:
     /* nothing */ { [] }
   | formal_list   { List.rev $1 }
 
 formal_list:
-    typ ID                   { [($1,$2)] }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
-
+    ID                   { [$1] }
+  | formal_list COMMA ID { $3 :: $1 }
+/*
 typ:
     INT { Int }
   | BOOL { Bool }
   | VOID { Void }
-
+*/
+/*
 vdecl_list:
-    /* nothing */    { [] }
+       { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
    typ ID SEMI { ($1, $2) }
+*/
 
 stmt_list:
     /* nothing */  { [] }
@@ -78,9 +86,18 @@ stmt:
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
-     { For($3, $5, $7, $9) }
+  | FOR ID IN expr LBRACE stmt RBRACE { For($2, $4, $6) }
+  | FOR ID IN expr COLON stmt { For($2, $4, $6) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+
+  /* | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
+     { For($3, $5, $7, $9) } */
+
+obj:
+    ID               { Id($1) }
+  | ID DOLLAR ID     { Attr($1,$3) }
+  | ID LBRACK expr RBRACK { Brac($1,$3) }
+  | ID LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -90,7 +107,7 @@ expr:
     LITERAL          { Literal($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
-  | ID               { Id($1) }
+  | obj              { Obj($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -103,9 +120,8 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3) }
   | expr AND    expr { Binop($1, And,   $3) }
   | expr OR     expr { Binop($1, Or,    $3) }
-  | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
+  | obj ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
 

@@ -24,7 +24,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
-%nonassoc DOLLAR
+
 
 %start program
 %type <Ast.program> program
@@ -44,7 +44,7 @@ tdecl_or_fdecl:
   | tdecl { $1 }
 
 fdecl:
-  FUN ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  FUN ID LPAREN formals_opt RPAREN LBRACE in_fun_stmt_list RBRACE
      { Func({ fname = $2;
 	 formals = $4;
 	 locals = [];
@@ -60,20 +60,6 @@ formals_opt:
 formal_list:
     ID                   { [$1] }
   | formal_list COMMA ID { $3 :: $1 }
-/*
-typ:
-    INT { Int }
-  | BOOL { Bool }
-  | VOID { Void }
-*/
-/*
-vdecl_list:
-       { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   typ ID SEMI { ($1, $2) }
-*/
 
 stmt_list:
     /* nothing */  { [] }
@@ -81,8 +67,6 @@ stmt_list:
 
 stmt:
     expr SEMI { Expr $1 }
-  | RETURN SEMI { Return Noexpr }
-  | RETURN expr SEMI { Return $2 }
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
@@ -90,8 +74,16 @@ stmt:
   | FOR ID IN expr COLON stmt { For($2, $4, $6) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
-  /* | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
-     { For($3, $5, $7, $9) } */
+in_fun_stmt_list:
+    /* nothing */  { [] }
+  | in_fun_stmt_list in_fun_stmt { $2 :: $1 }
+
+in_fun_stmt:
+    stmt { $1 }
+  | RETURN SEMI { Return Noexpr }
+  | RETURN expr SEMI { Return $2 }
+  | BREAK { Break }
+  | CONTINUE { Continue }
 
 obj:
     ID               { Id($1) }
@@ -120,6 +112,7 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3) }
   | expr AND    expr { Binop($1, And,   $3) }
   | expr OR     expr { Binop($1, Or,    $3) }
+  | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
   | obj ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }

@@ -55,7 +55,7 @@ rule token = parse
 | "in"       { IN }
 
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
-| (decimal exponent?)|(digit+exponent) as lxm { FLOAT(lxm) }
+| (decimal exponent?)|(digit+exponent) as lxm { FLOAT(float_of_string lxm) }
 | '"'([^'"']|("\\\""))*'"' as lxm { STRING(lxm) }
 | ['a'-'z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { TID(lxm) }

@@ -1,5 +1,6 @@
 calc
 tokenizer
+main
 parser.ml
 parser.mli
 scanner.ml

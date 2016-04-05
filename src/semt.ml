@@ -43,11 +43,7 @@ type program_stmt =
   | Stmt of stmt
 *)
 
-type program_decl =
-    Func of sem_func_decl
-  | Tup of sem_tup
-
-type program = sem_stmt list * program_decl list
+type sem_program = sem_stmt list * sem_func_decl list * sem_tup list
 
 (* Pretty-printing functions *)
 (*

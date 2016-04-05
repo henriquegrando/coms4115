@@ -2,6 +2,12 @@
 
 { open Parser }
 
+
+let digit = ['0'-'9']
+let exponent = ['e' 'E']['+' '-']?digit+
+let decimal = (digit+"."digit*)|(digit*"."digit+)
+let floatn =  (decimal exponent?)|(digit+exponent)
+
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Comments *)
@@ -49,6 +55,8 @@ rule token = parse
 | "in"       { IN }
 
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
+| (decimal exponent?)|(digit+exponent) as lxm { FLOAT(lxm) }
+| '"'([^'"']|("\\\""))*'"' as lxm { STRING(lxm) }
 | ['a'-'z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | ['A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { TID(lxm) }
 | eof { EOF }

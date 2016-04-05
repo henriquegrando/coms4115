@@ -10,6 +10,8 @@ open Ast
 %token RETURN IF ELSE FOR WHILE
 %token INCLUDE TUPLE DOLLAR BREAK CONTINUE FUN IN
 %token <int> LITERAL
+%token <float> FLOAT
+%token <string> STRING
 %token <string> ID
 %token <string> TID
 %token EOF
@@ -97,6 +99,8 @@ expr_opt:
 
 expr:
     LITERAL          { Literal($1) }
+  | FLOAT            { FloatLit($1) }
+  | STRING           { StrLit($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | obj              { Obj($1) }

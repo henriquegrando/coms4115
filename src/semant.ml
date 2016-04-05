@@ -1,6 +1,5 @@
 (* Semantic tree generation for the DaMPL translator *)
 
-open Ast
 open Semt
 
 module StringMap = Map.Make(String)
@@ -41,7 +40,6 @@ let check (globals, functions) =
     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
 
-    (*in *)
       (* Return the type of an expression or raise an exception*)
       let rec expr = function
             StrLit _ -> String

@@ -1,48 +1,33 @@
 (* Semantic Tree *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or
+open Ast
 
-type uop = Neg | Not
-
-type typ = Int | Float | Void | String | Tuple of string
+type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string
 
 
+type sem_tup_attr = typ * string
 
-type sem_tup = string * string list (* tuple creation *)
+type sem_tup = string * sem_tup_attr list (* tuple creation *)
 
-type obj = (* lhs *)
-    Id of string
-  | Brac of string * sem_expr (* a[0] a[i] a[i+1] *)
-  | Brac2 of string * sem_expr * sem_expr (* a[0:2] *)
-  | Attr of string * string (* a$b *)
-and
- sem_expr =
-    Literal of int
-  | BoolLit of bool
-  | FloatLit of float
-  | StrLit of string
-  | Obj of obj
-  | Binop of sem_expr * op * sem_expr(* as on lhs *)
-  | Unop of uop * sem_expr
-  | Assign of obj * sem_expr
-  | Call of string * sem_expr list
-  | TupInst of string (* tuple instantiation *)
-  | TabInst of string (* table instantiation e.g. Foo[] *)
-  | TupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
-  | Arr of sem_expr list (* arrays e.g. [1,2,3] *)
-  | Dict of sem_expr list * sem_expr list (* dicts *)
-  | Noexpr
+type sem_expr = typ * expr
 
-type stmt =
-    Block of stmt list
-  | Expr of sem_expr
-  | Return of sem_expr
-  | If of sem_expr * stmt * stmt
-  | For of string * sem_expr * stmt (* for i in a *)
-  | While of sem_expr * stmt
-  | Break
-  | Continue
+type sem_obj = (* lhs *)
+    SId of string
+  | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
+  | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
+  | SAttr of string * string (* a$b *)
+
+ 
+
+type sem_stmt =
+    SBlock of sem_stmt list
+  | SExpr of sem_expr
+  | SReturn of sem_expr
+  | SIf of sem_expr * sem_stmt * sem_stmt
+  | SFor of string * sem_expr * sem_stmt (* for i in a *)
+  | SWhile of sem_expr * sem_stmt
+  | SBreak
+  | SContinue
 
 type sem_func_decl = {
     rtyp: typ;
@@ -62,7 +47,7 @@ type program_decl =
     Func of sem_func_decl
   | Tup of sem_tup
 
-type program = stmt list * program_decl list
+type program = sem_stmt list * program_decl list
 
 (* Pretty-printing functions *)
 (*

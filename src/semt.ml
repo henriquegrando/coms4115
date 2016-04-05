@@ -5,9 +5,9 @@ open Ast
 type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string
 
 
-type sem_tup_attr = typ * string
+type typed_id = typ * string
 
-type sem_tup = string * sem_tup_attr list (* tuple creation *)
+type sem_tup = string * typed_id list (* tuple creation *)
 
 type sem_expr = typ * expr
 
@@ -32,9 +32,9 @@ type sem_stmt =
 type sem_func_decl = {
     rtyp: typ;
     fname : string;
-    formals : string list;
-    locals : string list;
-    body : stmt list;
+    formals : typed_id list;
+    locals : typed_id list;
+    body : sem_stmt list;
   }
 
 (*

@@ -9,8 +9,10 @@ module StringMap = Map.Make(String)
    throws an exception if something is wrong.
 
    Check each global variable, then check each function *)
+
 (*
-let check (globals, functions) =
+let check (statements, functions, tuples) =
+
   (*raise( Failure( "not implemented" ));;*)
 
   (* Function declaration for named functions *)

@@ -108,9 +108,9 @@ let string_of_fdecl fdecl =
 
 
 let string_of_program (statements, functions, tuples) = 
-  "#include <stdio.h>;\n" ^ "#include <stdlib.h>;\n" ^
-  "#include \"damplstd.h\";\n" ^
+  "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
+  "#include \"damplstd.h\"\n\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^ "\n" ^
-  "\nint main(){\n" ^
+  "int main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 
   "return 0;\n}\n"

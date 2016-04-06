@@ -7,10 +7,13 @@ type id_typ = Variable | Function
 
 let get_expr_typ exp = Void;; (* TODO *)
 
-let convert_expr exp = match exp with
+let rec convert_expr exp = match exp with
     StrLit(s) ->  SStrLit(s)
-  | Call(s,lst) -> SCall(s,lst)
-  | _ -> raise( Failure ("convert_expr case not implemented"));;
+  | Call(s,lst) -> SCall(s,convert_exprs lst)
+  | _ -> raise( Failure ("convert_expr case not implemented"))
+and convert_exprs exps = match exps with
+    e :: l -> (convert_expr e) :: (convert_exprs l)
+  | [] -> [];;
 
 let rec convert_stmt stmt = match stmt with
     Block(lst) -> SBlock(convert_stmts lst)

@@ -109,7 +109,7 @@ let string_of_fdecl fdecl =
 
 let string_of_program (statements, functions, tuples) = 
   "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
-  "#include \"damplstd.h\"\n\n" ^
+  "#include \"damplio.h\"\n\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^ "\n" ^
   "int main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 

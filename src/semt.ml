@@ -21,7 +21,7 @@ and
   | SBoolLit of bool
   | SFloatLit of float
   | SStrLit of string
-  | SObj of typ * sem_obj
+  | SObj of sem_obj
   | SBinop of typ * sem_expr * op * sem_expr(* as on lhs *)
   | SUnop of typ * uop * sem_expr
   | SAssign of typ * sem_obj * sem_expr
@@ -46,6 +46,7 @@ type sem_stmt =
   | SContinue
 
 type sem_func_decl = {
+    funid: int;
     parsed: bool;
     rtyp: typ;
     semfname : string;

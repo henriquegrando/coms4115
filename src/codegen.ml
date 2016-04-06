@@ -31,7 +31,7 @@ let string_of_uop = function
 
 let string_of_obj = function
     SId(s) -> "dampl_" ^ s
-  | _ -> raise ( Failure( "not implemented" ))
+  | _ -> raise ( Failure( "string_of_obj case not implemented" ))
   (*
   | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
   | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
@@ -44,7 +44,7 @@ let rec string_of_expr = function
   | SBoolLit(false) -> "0"
   | SFloatLit(f) -> string_of_float f
   | SStrLit(s) -> s
-  | SObj(t, o) -> string_of_obj o
+  | SObj(o) -> string_of_obj o
   | SBinop(t, e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | SUnop(t, o, e) -> string_of_uop o ^ string_of_expr e
@@ -59,7 +59,7 @@ let rec string_of_expr = function
   | SDict of expr list * expr list (* dicts *)
   *)
   | SNoexpr -> ""
-  | _ -> raise ( Failure( "not implemented" ))
+  | _ -> raise ( Failure( "string_of_expr case not implemented" ))
 
 
 let rec string_of_stmt = function
@@ -78,7 +78,7 @@ let rec string_of_stmt = function
   | SWhile(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | SBreak -> "break;\n"
   | SContinue -> "continue;\n"
-  | _ -> raise ( Failure( "not implemented" ))
+  | _ -> raise ( Failure( "string_of_stmt case not implemented" ))
 
 
 let string_of_typ = function
@@ -86,6 +86,7 @@ let string_of_typ = function
   | Int -> "int"
   | Float -> "float"
   | Void -> "void"
+  | Undefined -> raise(Failure("Undefined type on string_of_typ"))
   (*
   | String -> "string"
   
@@ -93,26 +94,26 @@ let string_of_typ = function
   | Table of string
   | Array of typ
  *)
-  | _ -> raise ( Failure( "not implemented" ))
+  | _ -> raise ( Failure( "string_of_typ case not implemented" ))
 
 let string_of_vdecl (id, t) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
 
-
+let string_of_formal f = (string_of_typ (fst f))^" dampl_"^(snd f)
 
 let string_of_fdecl fdecl =
   string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.semfname ^
-  "(" ^ String.concat ", " (List.map snd fdecl.semformals) ^
+  "(" ^ String.concat ", " (List.map string_of_formal fdecl.semformals) ^
   ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl (StringMap.bindings !(fdecl.semlocals) ) ) ^
   String.concat "" (List.map string_of_stmt fdecl.sembody) ^
-  "}\n"
+  "}\n\n"
 
 
 
 let string_of_program (statements, functions, tuples) = 
   "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
   "#include \"damplio.h\"\n\n" ^
-  String.concat "" (List.map string_of_fdecl functions) ^ "\n" ^
+  String.concat "" (List.map string_of_fdecl functions) ^
   "int main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 
   "return 0;\n}\n"

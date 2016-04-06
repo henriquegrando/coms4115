@@ -91,7 +91,7 @@ let string_of_typ = function
   | Array of typ
  *)
 
-let string_of_vdecl (t, id) = string_of_typ t ^ " damp_" ^ id ^ ";\n"
+let string_of_vdecl (t, id) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
   string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.fname ^

@@ -24,7 +24,7 @@ and
   | SBinop of typ * expr * op * expr(* as on lhs *)
   | SUnop of typ * uop * expr
   | SAssign of typ * obj * expr
-  | SCall of typ * string * expr list
+  | SCall of string * expr list
   (* TODO: add typ below *)
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
@@ -46,10 +46,10 @@ type sem_stmt =
 
 type sem_func_decl = {
     rtyp: typ;
-    fname : string;
-    formals : typed_id list;
-    locals : typed_id list;
-    body : sem_stmt list;
+    semfname : string;
+    semformals : typed_id list;
+    semlocals : typed_id list;
+    sembody : sem_stmt list;
   }
 
 (*

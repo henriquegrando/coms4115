@@ -9,7 +9,7 @@ module StringMap = Map.Make(String)
    throws an exception if something is wrong.
 
    Check each global variable, then check each function *)
-
+(*
 let check (globals, functions) =
   (*raise( Failure( "not implemented" ));;*)
 
@@ -68,3 +68,4 @@ let check (globals, functions) =
   in
   List.iter check_function functions
 
+*)

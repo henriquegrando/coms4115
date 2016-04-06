@@ -50,7 +50,7 @@ let rec string_of_expr = function
   | SUnop(t, o, e) -> string_of_uop o ^ string_of_expr e
   | SAssign(t, v, e) -> string_of_obj v ^ " = " ^ string_of_expr e
   | SCall(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+      "dampl_" ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   (*
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
@@ -108,9 +108,9 @@ let string_of_fdecl fdecl =
 
 
 let string_of_program (statements, functions, tuples) = 
-  "#include <stdio.h>;\n" ^ "#include <stdlib.h>;" ^
+  "#include <stdio.h>;\n" ^ "#include <stdlib.h>;\n" ^
   "#include \"damplstd.h\";\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^ "\n" ^
   "\nint main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 
-  "}\n"
+  "return 0;\n}\n"

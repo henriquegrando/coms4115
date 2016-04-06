@@ -1,5 +1,6 @@
 (* Semantic tree generation for the DaMPL translator *)
 
+open Ast
 open Semt
 
 module StringMap = Map.Make(String)
@@ -28,22 +29,16 @@ let check (globals, functions) =
 
   let check_function func =
 
-    List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
-      " in " ^ func.fname)) func.formals;
-
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
-
-    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
-      " in " ^ func.fname)) func.locals;
 
     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
 
       (* Return the type of an expression or raise an exception*)
       let rec expr = function
-            StrLit _ -> String
-          | Call(fname, actuals) as call -> let fd = function_decl fname in
+            SStrLit _ -> String
+          | SCall(fname, actuals) as call -> let fd = function_decl fname in
            if List.length actuals != List.length fd.formals then
              raise (Failure ("expecting " ^ string_of_int
                (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
@@ -58,17 +53,17 @@ let check (globals, functions) =
 
       (* Verify a statement or throw an exception *)
       let rec stmt = function
-            Block sl -> let rec check_block = function
-                 [Return _ as s] -> stmt s
-               | Return _ :: _ -> raise (Failure "nothing may follow a return")
-               | Block sl :: ss -> check_block (sl @ ss)
+            SBlock sl -> let rec check_block = function
+                 [SReturn _ as s] -> stmt s
+               | SReturn _ :: _ -> raise (Failure "nothing may follow a return")
+               | SBlock sl :: ss -> check_block (sl @ ss)
                | s :: ss -> stmt s ; check_block ss
                | [] -> ()
               in check_block sl
-          | Expr e -> ignore (expr e)
+          | SExpr e -> ignore (expr e)
       in
 
-      stmt (Block func.body)
+      stmt (SBlock func.body)
 
   in
   List.iter check_function functions

@@ -2,21 +2,36 @@
 
 open Ast
 
-type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string
+type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string | Table of string | Array of typ
 
 
 type typed_id = typ * string
 
 type sem_tup = string * typed_id list (* tuple creation *)
 
-type sem_expr = typ * expr
-
 type sem_obj = (* lhs *)
     SId of string
   | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
   | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
   | SAttr of string * string (* a$b *)
-
+and
+ sem_expr =
+    SLiteral of int
+  | SBoolLit of bool
+  | SFloatLit of float
+  | SStrLit of string
+  | SObj of typ * sem_obj
+  | SBinop of typ * expr * op * expr(* as on lhs *)
+  | SUnop of typ * uop * expr
+  | SAssign of typ * obj * expr
+  | SCall of typ * string * expr list
+  (* TODO: add typ below *)
+  | STupInst of string (* tuple instantiation *)
+  | STabInst of string (* table instantiation e.g. Foo[] *)
+  | STupInit of string * expr list (* tuple init e.g. Foo{1,2,"abc"} *)
+  | SArr of expr list (* arrays e.g. [1,2,3] *)
+  | SDict of expr list * expr list (* dicts *)
+  | SNoexpr
  
 
 type sem_stmt =

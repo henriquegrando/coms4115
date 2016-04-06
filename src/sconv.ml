@@ -5,6 +5,8 @@ module StringMap = Map.Make(String);;
 
 type id_typ = Variable | Function
 
+let get_expr_typ exp = Void;; (* TODO *)
+
 let convert_expr exp = match exp with
     StrLit(s) ->  SStrLit(s)
   | Call(s,lst) -> SCall(s,lst)
@@ -27,13 +29,19 @@ let rec convert_ids_to_undef_typed_ids (ids : string list) : typed_id list = mat
     id :: l -> (convert_id_to_undef_typed_id id) :: (convert_ids_to_undef_typed_ids l)
   | [] -> [];;
 
-let get_typ_from_fun_sembody name body = (* match body with *)
-  Void;;
+let rec get_typ_from_fun_sembody name body = match body with
+    SReturn(exp)::l -> get_expr_typ exp
+  | _::l -> get_typ_from_fun_sembody name l
+  | [] -> Void;;
+  
 
 
 let convert_fun_decl fd = 
   let body = convert_stmts fd.body in
-  { rtyp = (get_typ_from_fun_sembody fd.fname body);
+  let rettyp = (get_typ_from_fun_sembody fd.fname body) in
+  { rtyp = if (rettyp == Undefined)  
+          then raise(Failure("fun "^fd.fname^" has Undefined return"))
+          else rettyp;
    semfname = fd.fname;
    semformals = (convert_ids_to_undef_typed_ids fd.formals);
    semlocals = (convert_ids_to_undef_typed_ids fd.locals);

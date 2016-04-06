@@ -95,13 +95,15 @@ let string_of_typ = function
  *)
   | _ -> raise ( Failure( "not implemented" ))
 
-let string_of_vdecl (t, id) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
+let string_of_vdecl (id, t) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
+
+
 
 let string_of_fdecl fdecl =
   string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.semfname ^
   "(" ^ String.concat ", " (List.map snd fdecl.semformals) ^
   ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.semlocals) ^
+  String.concat "" (List.map string_of_vdecl (StringMap.bindings !(fdecl.semlocals) ) ) ^
   String.concat "" (List.map string_of_stmt fdecl.sembody) ^
   "}\n"
 

@@ -4,6 +4,7 @@ open Ast
 
 type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string | Table of string | Array of typ
 
+module StringMap = Map.Make(String);;
 
 type typed_id = typ * string
 
@@ -45,10 +46,11 @@ type sem_stmt =
   | SContinue
 
 type sem_func_decl = {
+    parsed: bool;
     rtyp: typ;
     semfname : string;
     semformals : typed_id list;
-    semlocals : typed_id list;
+    semlocals : typ StringMap.t ref;
     sembody : sem_stmt list;
   }
 

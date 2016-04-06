@@ -3,9 +3,9 @@ produces C
 
 *)
 
-module A = Ast
+open Ast
 
-module S = Semt
+open Semt
 
 module StringMap = Map.Make(String)
 
@@ -31,6 +31,7 @@ let string_of_uop = function
 
 let string_of_obj = function
     SId(s) -> "dampl_" ^ s
+  | _ -> raise ( Failure( "not implemented" ))
   (*
   | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
   | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
@@ -43,11 +44,11 @@ let rec string_of_expr = function
   | SBoolLit(false) -> "0"
   | SFloatLit(f) -> string_of_float f
   | SStrLit(s) -> s
-  | SObj(o) -> string_of_obj o
+  | SObj(t, o) -> string_of_obj o
   | SBinop(t, e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | SUnop(t, o, e) -> string_of_uop o ^ string_of_expr e
-  | SAssign(t, v, e) -> v ^ " = " ^ string_of_expr e
+  | SAssign(t, v, e) -> string_of_obj v ^ " = " ^ string_of_expr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   (*
@@ -58,6 +59,7 @@ let rec string_of_expr = function
   | SDict of expr list * expr list (* dicts *)
   *)
   | SNoexpr -> ""
+  | _ -> raise ( Failure( "not implemented" ))
 
 
 let rec string_of_stmt = function
@@ -65,7 +67,7 @@ let rec string_of_stmt = function
       "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
   | SExpr(expr) -> string_of_expr expr ^ ";\n";
   | SReturn(expr) -> "return " ^ string_of_expr expr ^ ";\n";
-  | SIf(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
+  | SIf(e, s, SBlock([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
   | SIf(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   (*
@@ -73,9 +75,10 @@ let rec string_of_stmt = function
       "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s
     *)
-  | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
+  | SWhile(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | SBreak -> "break;\n"
   | SContinue -> "continue;\n"
+  | _ -> raise ( Failure( "not implemented" ))
 
 
 let string_of_typ = function
@@ -90,15 +93,16 @@ let string_of_typ = function
   | Table of string
   | Array of typ
  *)
+  | _ -> raise ( Failure( "not implemented" ))
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
-  string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.fname ^
-  "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
+  string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.semfname ^
+  "(" ^ String.concat ", " (List.map snd fdecl.semformals) ^
   ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
+  String.concat "" (List.map string_of_vdecl fdecl.semlocals) ^
+  String.concat "" (List.map string_of_stmt fdecl.sembody) ^
   "}\n"
 
 
@@ -106,7 +110,7 @@ let string_of_fdecl fdecl =
 let string_of_program (statements, functions, tuples) = 
   "#include <stdio.h>;\n" ^ "#include <stdlib.h>;" ^
   "#include \"damplstd.h\";\n" ^
-  String.concat "" (List.map string_of_fdecl funcs) ^ "\n" ^
+  String.concat "" (List.map string_of_fdecl functions) ^ "\n" ^
   "\nint main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 
   "}\n"

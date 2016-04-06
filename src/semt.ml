@@ -21,16 +21,16 @@ and
   | SFloatLit of float
   | SStrLit of string
   | SObj of typ * sem_obj
-  | SBinop of typ * expr * op * expr(* as on lhs *)
-  | SUnop of typ * uop * expr
-  | SAssign of typ * obj * expr
-  | SCall of string * expr list
+  | SBinop of typ * sem_expr * op * sem_expr(* as on lhs *)
+  | SUnop of typ * uop * sem_expr
+  | SAssign of typ * sem_obj * sem_expr
+  | SCall of string * sem_expr list
   (* TODO: add typ below *)
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
-  | STupInit of string * expr list (* tuple init e.g. Foo{1,2,"abc"} *)
-  | SArr of expr list (* arrays e.g. [1,2,3] *)
-  | SDict of expr list * expr list (* dicts *)
+  | STupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
+  | SArr of sem_expr list (* arrays e.g. [1,2,3] *)
+  | SDict of sem_expr list * sem_expr list (* dicts *)
   | SNoexpr
  
 

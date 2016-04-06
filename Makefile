@@ -7,4 +7,4 @@ project:
 
 .PHONY: clean
 clean:
-	rm -f *c hello dampl
+	rm -f *.c hello dampl

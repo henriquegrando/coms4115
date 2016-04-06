@@ -8,3 +8,5 @@ project:
 .PHONY: clean
 clean:
 	rm -f *.c hello dampl
+	cd src; make clean
+	cd libs; make clean

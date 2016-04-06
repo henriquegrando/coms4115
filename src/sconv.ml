@@ -3,13 +3,21 @@ open Semt
 
 module StringMap = Map.Make(String);;
 
+let built_in_decls = StringMap.singleton "print"
+   { rtyp = Void; semfname = "print"; semformals = [(String, "x")];
+     semlocals = []; sembody = [] };;
+
+let fun_decls = ref built_in_decls;;
+
 type id_typ = Variable | Function
 
 let get_expr_typ exp = Void;; (* TODO *)
 
 let rec convert_expr exp = match exp with
     StrLit(s) ->  SStrLit(s)
-  | Call(s,lst) -> SCall(s,convert_exprs lst)
+  | Call(s,lst) -> if (StringMap.mem s !fun_decls)
+          then SCall(s,convert_exprs lst)
+          else raise (Failure ("fun "^s^" not defined"))
   | _ -> raise( Failure ("convert_expr case not implemented"))
 and convert_exprs exps = match exps with
     e :: l -> (convert_expr e) :: (convert_exprs l)
@@ -42,13 +50,16 @@ let rec get_typ_from_fun_sembody name body = match body with
 let convert_fun_decl fd = 
   let body = convert_stmts fd.body in
   let rettyp = (get_typ_from_fun_sembody fd.fname body) in
-  { rtyp = if (rettyp == Undefined)  
+  let return = { rtyp = if (rettyp == Undefined)  
           then raise(Failure("fun "^fd.fname^" has Undefined return"))
           else rettyp;
    semfname = fd.fname;
    semformals = (convert_ids_to_undef_typed_ids fd.formals);
    semlocals = (convert_ids_to_undef_typed_ids fd.locals);
-   sembody = body; };;
+   sembody = body; } in
+  ignore(if StringMap.mem fd.fname !fun_decls then raise (Failure("cant redeclare "^fd.fname)) );
+  fun_decls := StringMap.add fd.fname return !fun_decls;
+  return;;
 
 let rec convert_funs_from_decls decls = match decls with
     Func(f_decl)::l -> (convert_fun_decl f_decl) :: (convert_funs_from_decls l)
@@ -56,6 +67,7 @@ let rec convert_funs_from_decls decls = match decls with
   | [] -> [];;
 
 let convert (stmts, decls) =
-  (convert_stmts stmts,convert_funs_from_decls decls,[]);;
+  let fun_att = convert_funs_from_decls decls in
+  (convert_stmts stmts,fun_att,[]);;
 
 

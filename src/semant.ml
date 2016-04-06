@@ -10,7 +10,7 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-(*
+
 let check (statements, functions, tuples) =
 
   (*raise( Failure( "not implemented" ));;*)
@@ -69,5 +69,3 @@ let check (statements, functions, tuples) =
 
   in
   List.iter check_function functions
-
-*)

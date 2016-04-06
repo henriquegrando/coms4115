@@ -22,7 +22,7 @@ calculator.tar.gz : $(TARFILES)
 
 .PHONY : clean
 clean :
-	rm -f dampl main tokenizer parser.ml parser.mli scanner.ml *.cmo *.cmi
+	rm -f dampl main tokenizer parser.ml parser.mli scanner.ml *.cmo *.cmi *.output
 
 .PHONY : all
 all : clean dampl

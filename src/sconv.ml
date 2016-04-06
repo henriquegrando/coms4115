@@ -69,5 +69,3 @@ let rec convert_funs_from_decls decls = match decls with
 let convert (stmts, decls) =
   let fun_att = convert_funs_from_decls decls in
   (convert_stmts stmts,fun_att,[]);;
-
-

@@ -14,16 +14,25 @@ let fun_decls = ref built_in_decls;;
 
 let fun_abodies = ref StringMap.empty;;
 
+let globals = ref StringMap.empty;;
+
 let fun_count = ref 0;;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
+let a =
+(Stack.push "_global_" fun_parser_stack);
+1;;
 
-let a = Stack.push "" fun_parser_stack;;
 
 
 let get_id_typ_from_locals id fname =
   let semfdecl = StringMap.find fname !fun_decls in
   StringMap.find id !(semfdecl.semlocals);;
+
+let get_string_of_sem_obj semobj = match semobj with
+    SId(id) -> id
+  | _ -> raise(Failure("get_string_of_sem_obj case not implemented"))
+
 
 let get_obj_typ (o : sem_obj) : typ = match o with
     SId(id) ->
@@ -41,8 +50,13 @@ let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
   | SNoexpr | _ -> Void
 ;; 
 
+(* TODO: improve this function *)
 let rec get_typ_from_fun_sembody name body = match body with
-    SReturn(exp)::l -> get_expr_typ exp
+    SReturn(exp)::l ->
+      let rettyp = get_expr_typ exp in
+      if rettyp == Void then
+      raise(Failure("fun "^name^": cant return void"))
+      else rettyp
   | _::l -> get_typ_from_fun_sembody name l
   | [] -> Void;;
 
@@ -76,6 +90,10 @@ let rec check_if_exists_in_stack stack str =
     if (Stack.pop stack) == str
     then true
     else check_if_exists_in_stack stack str;;
+
+let add_id_to_map mapref semobj expr_typ =
+  mapref := StringMap.add (get_string_of_sem_obj semobj) expr_typ !mapref;
+  ()
 
 let rec parse_semfdecl semfdecl typs =
   if check_if_exists_in_stack (Stack.copy fun_parser_stack) semfdecl.semfname
@@ -125,6 +143,7 @@ and convert_obj (o : obj) : sem_obj = match o with
 and convert_expr (exp : expr) : sem_expr = match exp with
     Literal(i) -> SLiteral(i)
   | StrLit(s) ->  SStrLit(s)
+  | Assign(o,e) -> convert_assign o e
   | Call(s,lst) -> (let exprs = convert_exprs lst in
           (handle_scall s (List.map get_expr_typ exprs) );
           SCall(s,exprs) )
@@ -145,6 +164,43 @@ and convert_stmt stmt = match stmt with
 and convert_stmts stmts = match stmts with
     s :: l -> (convert_stmt s) :: (convert_stmts l)
   | [] -> []
+
+and convert_assign o e = (
+  let semexpr = convert_expr e in
+  let semobj = convert_obj o in
+  let expr_typ = (get_expr_typ semexpr) in
+  if (Stack.top fun_parser_stack) = "_global_"
+  then (
+    if StringMap.mem (get_string_of_sem_obj semobj) !globals
+    then (
+      let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !globals in
+      if expectedtyp == get_expr_typ semexpr
+      then SAssign(expr_typ,semobj, semexpr)
+      else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
+    ) else ( add_id_to_map globals semobj expr_typ;
+    SAssign(expr_typ,semobj, semexpr)
+    )
+  ) else (
+    let semfdecl = StringMap.find (Stack.top fun_parser_stack) !fun_decls in
+    if StringMap.mem (get_string_of_sem_obj semobj) !(semfdecl.semlocals)
+    then (
+      let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !(semfdecl.semlocals) in
+      if expectedtyp == get_expr_typ semexpr
+      then SAssign(expr_typ,semobj, semexpr)
+      else raise(Failure("cant change var "^(get_string_of_sem_obj semobj)^" type"))
+    ) else (
+      if StringMap.mem (get_string_of_sem_obj semobj) !globals
+      then (
+        let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !globals in
+        if expectedtyp == get_expr_typ semexpr
+        then SAssign(expr_typ,semobj, semexpr)
+        else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
+      ) else ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
+      SAssign(expr_typ,semobj, semexpr)
+      )
+    )
+  )
+)
 (*
 and convert_stmt_ignoring_unparsed_call stmt = match stmt with
     Call(name,_) ->
@@ -196,17 +252,20 @@ let rec remove_formals_from_locals formals map = match formals with
   | f::lst -> StringMap.remove (snd f) (remove_formals_from_locals lst map)
   | [] -> map;;
 
-let map_to_list_fold_helper k v l =
+let fun_map_to_list_fold_helper k v l =
   (* print_string ("function: "^(string_of_typ v.rtyp)^" "^v.semfname^"\n" ); *)
   v.semlocals := remove_formals_from_locals v.semformals !(v.semlocals);
   if (v.funid == -1 || not v.parsed) then l else v::l;;
+
+let globals_map_to_list_fold_helper k v l = (v,k)::l
 
 let convert (stmts, decls) =
   create_funs_from_decls decls;
   let semstmts = convert_stmts stmts in
   (
+    (StringMap.fold globals_map_to_list_fold_helper !globals []),
     List.rev (semstmts),
-    (StringMap.fold map_to_list_fold_helper !fun_decls []),
+    (StringMap.fold fun_map_to_list_fold_helper !fun_decls []),
     []
   );;
 

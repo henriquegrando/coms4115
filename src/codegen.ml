@@ -100,7 +100,10 @@ let string_of_vdecl (id, t) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"
 
 let string_of_formal f = (string_of_typ (fst f))^" dampl_"^(snd f)
 
-let fdecl_prototypes fdecl =
+let string_of_global global =
+  string_of_typ (fst global) ^ " " ^ " dampl_" ^ (snd global) ^";\n";;
+
+let fdecl_prototype fdecl =
   string_of_typ fdecl.rtyp ^ " " ^ " dampl_" ^ fdecl.semfname ^
   "(" ^ String.concat ", " (List.map string_of_formal fdecl.semformals) ^
   ");\n";;
@@ -115,10 +118,11 @@ let string_of_fdecl fdecl =
 
 
 
-let string_of_program (statements, functions, tuples) = 
+let string_of_program (globals, statements, functions, tuples) = 
   "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
   "#include \"damplio.h\"\n\n" ^
-  String.concat "" (List.map fdecl_prototypes functions) ^ "\n" ^
+  String.concat "" (List.map string_of_global globals) ^ "\n" ^
+  String.concat "" (List.map fdecl_prototype functions) ^ "\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^
   "int main(){\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 

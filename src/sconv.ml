@@ -18,7 +18,7 @@ let fun_count = ref 0;;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
 
-let a = Stack.push "" fun_parser_stack;; 
+let a = Stack.push "" fun_parser_stack;;
 
 
 let get_id_typ_from_locals id fname =
@@ -37,7 +37,8 @@ let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
     SLiteral(_) -> Int
   | SStrLit(_) -> String
   | SObj(o) -> get_obj_typ o
-  | _ -> Void
+  | SCall(name,_) -> (StringMap.find name !fun_decls).rtyp
+  | SNoexpr | _ -> Void
 ;; 
 
 let rec get_typ_from_fun_sembody name body = match body with
@@ -68,21 +69,37 @@ let update_formal_typs_in_semfdecl (old : sem_func_decl) (typs : typ list) : sem
     semlocals = ref newlocals;
   }
 
+let rec check_if_exists_in_stack stack str =
+  if Stack.is_empty stack
+  then false
+  else
+    if (Stack.pop stack) == str
+    then true
+    else check_if_exists_in_stack stack str;;
+
 let rec parse_semfdecl semfdecl typs =
-  Stack.push semfdecl.semfname fun_parser_stack;
-  let newsemfdecl = update_formal_typs_in_semfdecl semfdecl typs in
-  let abody = StringMap.find newsemfdecl.semfname !fun_abodies in
-  fun_decls := StringMap.add newsemfdecl.semfname newsemfdecl !fun_decls;
-  let newsembody = convert_stmts abody in 
-  let newrtype = get_typ_from_fun_sembody semfdecl.semfname newsembody in
-  let newnewsemfdecl = { newsemfdecl with
-    sembody = newsembody;
-    rtyp = newrtype;
-    parsed = true;
-  } in
-  fun_decls := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !fun_decls;
-  ignore(Stack.pop fun_parser_stack);
-  ()
+  if check_if_exists_in_stack (Stack.copy fun_parser_stack) semfdecl.semfname
+  then () (* function already being parsed, do nothing *)
+  else (
+    Stack.push semfdecl.semfname fun_parser_stack;
+    let newsemfdecl = update_formal_typs_in_semfdecl semfdecl typs in
+    let abody = StringMap.find newsemfdecl.semfname !fun_abodies in
+    fun_decls := StringMap.add newsemfdecl.semfname newsemfdecl !fun_decls;
+    let newsembody = convert_stmts abody in 
+    let newrtype = get_typ_from_fun_sembody semfdecl.semfname newsembody in
+    if newrtype == Undefined then
+    raise(Failure("cant determine fun "^semfdecl.semfname^" return type (mutual recursion?)"))
+    else (
+      let newnewsemfdecl = { newsemfdecl with
+        sembody = newsembody;
+        rtyp = newrtype;
+        parsed = true;
+      } in
+      fun_decls := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !fun_decls;
+      ignore(Stack.pop fun_parser_stack);
+      ()
+    )
+  )
 
 and handle_scall (name : string) (typs : typ list) : unit =
   if (StringMap.mem name !fun_decls)
@@ -112,6 +129,7 @@ and convert_expr (exp : expr) : sem_expr = match exp with
           (handle_scall s (List.map get_expr_typ exprs) );
           SCall(s,exprs) )
   | Obj(o) -> SObj(convert_obj o)
+  | Noexpr -> SNoexpr
   | _ -> raise( Failure ("convert_expr case not implemented"))
 and convert_exprs (exps : expr list) : sem_expr list = match exps with
     e :: l -> (convert_expr e) :: (convert_exprs l)
@@ -126,34 +144,26 @@ and convert_stmt stmt = match stmt with
 
 and convert_stmts stmts = match stmts with
     s :: l -> (convert_stmt s) :: (convert_stmts l)
-  | [] -> [];;
+  | [] -> []
+(*
+and convert_stmt_ignoring_unparsed_call stmt = match stmt with
+    Call(name,_) ->
+      let semfdecl = StringMap.find name !fun_decls in
+      if semfdecl.parsed
+      then convert_stmt stmt
+      else SIgnoredCall
+  | _ -> convert_stmt stmt
 
+  and convert_stmts_ignoring_unparsed_calls stmts = match stmts with
+    s :: l -> (convert_stmt_ignoring_unparsed_call s) :: (convert_stmts_ignoring_unparsed_calls l)
+  | [] -> [];;
+*)
 
 let convert_id_to_undef_typed_id (id : string) : typed_id = (Undefined, id);;
 
 let rec convert_ids_to_undef_typed_ids (ids : string list) : typed_id list = match ids with
     id :: l -> (convert_id_to_undef_typed_id id) :: (convert_ids_to_undef_typed_ids l)
   | [] -> [];;
-
-
-(* let convert_ids_to_semlocals *)
-
-(*
-let convert_fun_decl fd = 
-  let body = convert_stmts fd.body in
-  let rettyp = (get_typ_from_fun_sembody fd.fname body) in
-  let return = { parsed = false;
-   rtyp = if (rettyp == Undefined)
-          then raise(Failure("fun "^fd.fname^" has Undefined return"))
-          else rettyp;
-   semfname = fd.fname;
-   semformals = (convert_ids_to_undef_typed_ids fd.formals);
-   semlocals = ref StringMap.empty;
-   sembody = body; } in
-  (* ignore(if StringMap.mem fd.fname !fun_decls then raise (Failure("cant redeclare "^fd.fname)) ); *)
-  fun_decls := StringMap.add fd.fname return !fun_decls;
-  return;;
-*)
 
 let create_fun_decl fd = 
   (* let body = convert_stmts fd.body in
@@ -174,13 +184,6 @@ let rec create_funs_from_decls decls = match decls with
   | Tup(_)::l -> create_funs_from_decls l
   | [] -> ();;
 
-(*
-let rec convert_funs_from_decls decls = match decls with
-    Func(f_decl)::l -> (convert_fun_decl f_decl) :: (convert_funs_from_decls l)
-  | Tup(_)::l -> (convert_funs_from_decls l)
-  | [] -> [];;
-*)
-
 let string_of_typ = function
     Bool -> "Bool"
   | Int -> "Int"
@@ -200,8 +203,6 @@ let map_to_list_fold_helper k v l =
 
 let convert (stmts, decls) =
   create_funs_from_decls decls;
-  (*let fun_att = convert_funs_from_decls decls in*)
-  (* TODO: get fdecls from map and create a list to be returned *)
   let semstmts = convert_stmts stmts in
   (
     List.rev (semstmts),

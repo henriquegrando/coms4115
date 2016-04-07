@@ -1,7 +1,8 @@
 
 fun foo(a) {
-	print("oi\n");
-	return a;
+	print("hi\n");
+	lastone();
+	return;
 }
 
 fun bar(a) {
@@ -11,3 +12,7 @@ fun bar(a) {
 }
 
 bar(1);
+
+fun lastone() {
+	print("bye!\n");
+}

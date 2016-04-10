@@ -46,10 +46,9 @@ type sem_stmt =
   | SContinue
 
 type sem_func_decl = {
-    funid: int;
-    parsed: bool;
     rtyp: typ;
     semfname : string;
+    originalname: string;
     semformals : typed_id list;
     semlocals : typ StringMap.t ref;
     sembody : sem_stmt list;

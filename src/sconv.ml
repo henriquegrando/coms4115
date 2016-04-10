@@ -1,32 +1,89 @@
 open Ast
 open Semt
-
+open Stack
 module StringMap = Map.Make(String);;
 
-open Stack
+let param_separator = "__"
 
-let built_in_decls = StringMap.singleton "print"
-  { funid = -1; parsed = true; rtyp = Void; semfname = "print";
-    semformals = [(String, "x")];
-    semlocals = ref StringMap.empty; sembody = [] };;
+let fun_decls = ref StringMap.empty;;
 
-let fun_decls = ref built_in_decls;;
+(*
+let parsed_funs = ref (StringMap.singleton ("print"^param_separator^"str")
+  { rtyp = Void; semfname = ("print"^param_separator^"str");
+    originalname = "print"; semformals = [(String, "x")];
+    semlocals = ref StringMap.empty; sembody = [] } );;
+*)
 
 let fun_abodies = ref StringMap.empty;;
 
 let globals = ref StringMap.empty;;
 
-let fun_count = ref 0;;
+let funs_to_reparse = ref [];;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
-let a =
-(Stack.push "_global_" fun_parser_stack);
-1;;
+
+let built_in_prototypes = [
+  (Void,"print",[
+    [String];
+    [Int];
+    [Float]
+  ])
+];;
+
+let get_built_in_rtyp = function
+    (t,_,_) -> t 
+
+let get_built_in_name = function
+    (_,name,_) -> name 
+
+let get_built_in_formals = function
+    (_,_,formals) -> formals 
+
+let string_of_param_typ = function
+    Bool -> "bool"
+  | Int -> "int"
+  | Float -> "float"
+  | String -> "str"
+  | Void -> "void"
+  | Undefined -> raise(Failure("Undefined param on string_of_param_typ"))
+  | _ -> raise(Failure("string_of_param_typ case not implemented"))
+
+let get_built_in_name_folder map fun_prot =
+  StringMap.add (get_built_in_name fun_prot) true map;;
+
+let built_in_decls =
+  List.fold_left get_built_in_name_folder StringMap.empty built_in_prototypes;;
+
+let generate_fun_name (name : string) (typs: typ list) : string = 
+  name^param_separator^(String.concat "_" (List.map string_of_param_typ typs))
+
+let built_in_prot_map_folder map fun_prot =
+  let build_formal ftyp = (ftyp,"x") in
+  let build_formals typlist = List.map build_formal typlist in
+  let rec build_prot_map rtyp name protlist mmap = match protlist with
+      prot::l -> 
+        let funname = generate_fun_name name prot in
+        let semfdecl = {
+          rtyp = rtyp; semfname = funname;
+          originalname = name; semformals = build_formals prot;
+          semlocals = ref StringMap.empty; sembody = [];
+        } in StringMap.add funname semfdecl (build_prot_map rtyp name l mmap)
+    | [] -> mmap
+  in build_prot_map (get_built_in_rtyp fun_prot) (get_built_in_name fun_prot)
+    (get_built_in_formals fun_prot) map;;
 
 
+let parsed_funs = ref 
+  (List.fold_left built_in_prot_map_folder StringMap.empty built_in_prototypes);;
 
-let get_id_typ_from_locals id fname =
-  let semfdecl = StringMap.find fname !fun_decls in
+let is_logical_op = function
+  | Equal | Neq | Less | Leq | Greater | Geq | And | Or -> true
+  | _ -> false
+
+let pv k v = print_string("\nvar: "^k);;
+
+let get_id_typ_from_locals id fname = 
+  let semfdecl = StringMap.find fname !parsed_funs in
   StringMap.find id !(semfdecl.semlocals);;
 
 let get_string_of_sem_obj semobj = match semobj with
@@ -35,9 +92,9 @@ let get_string_of_sem_obj semobj = match semobj with
 
 
 let get_obj_typ (o : sem_obj) : typ = match o with
-    SId(id) ->
+    SId(id) -> (* print_string(id); print_string(Stack.top fun_parser_stack); *)
       let fname = (Stack.top fun_parser_stack) in
-      if fname <> ""
+      if fname <> "_global_"
       then get_id_typ_from_locals id fname
       else raise(Failure("var "^id^" not found, global var support to be implemented"))
   | _ -> raise(Failure("get_obj_typ case not implemented"))
@@ -45,8 +102,11 @@ let get_obj_typ (o : sem_obj) : typ = match o with
 let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
     SLiteral(_) -> Int
   | SStrLit(_) -> String
+  | SFloatLit(_) -> Float
+  | SBoolLit(_) -> Bool
   | SObj(o) -> get_obj_typ o
-  | SCall(name,_) -> (StringMap.find name !fun_decls).rtyp
+  | SBinop(t,_,_,_) -> t
+  | SCall(name,_) -> (StringMap.find name !parsed_funs).rtyp
   | SNoexpr | _ -> Void
 ;; 
 
@@ -54,7 +114,9 @@ let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
 let rec get_typ_from_fun_sembody name body = match body with
     SReturn(exp)::l ->
       let rettyp = get_expr_typ exp in
-      if rettyp == Void then
+      if rettyp == Undefined then
+      get_typ_from_fun_sembody name l
+      else if rettyp == Void then
       raise(Failure("fun "^name^": cant return void"))
       else rettyp
   | _::l -> get_typ_from_fun_sembody name l
@@ -75,10 +137,10 @@ let rec generate_new_formals_and_locals oldformals typs =
   | _, _ -> raise(Failure ( "generate_new_formals_and_locals error" ))
 ;;
 
-let update_formal_typs_in_semfdecl (old : sem_func_decl) (typs : typ list) : sem_func_decl =
+let update_formal_typs_in_semfdecl (newname: string) (old : sem_func_decl) (typs : typ list) : sem_func_decl =
   let newformals, newlocals = generate_new_formals_and_locals old.semformals typs in 
-
   { old with
+    semfname = newname;
     semformals = newformals;
     semlocals = ref newlocals;
   }
@@ -92,109 +154,160 @@ let rec check_if_exists_in_stack stack str =
     else check_if_exists_in_stack stack str;;
 
 let add_id_to_map mapref semobj expr_typ =
+  (* print_string("adding "^(get_string_of_sem_obj semobj)); *)
   mapref := StringMap.add (get_string_of_sem_obj semobj) expr_typ !mapref;
+  (* (StringMap.iter pv !mapref); *)
   ()
 
-let rec parse_semfdecl semfdecl typs =
+let rec parse_semfdecl newname semfdecl typs =
+  let callername = Stack.top fun_parser_stack in
   if check_if_exists_in_stack (Stack.copy fun_parser_stack) semfdecl.semfname
-  then () (* function already being parsed, do nothing *)
+  then (* function already being parsed, so reparse caller later *)
+    (funs_to_reparse := callername :: (!funs_to_reparse) )
   else (
-    Stack.push semfdecl.semfname fun_parser_stack;
-    let newsemfdecl = update_formal_typs_in_semfdecl semfdecl typs in
-    let abody = StringMap.find newsemfdecl.semfname !fun_abodies in
-    fun_decls := StringMap.add newsemfdecl.semfname newsemfdecl !fun_decls;
+    Stack.push newname fun_parser_stack;
+    let newsemfdecl = update_formal_typs_in_semfdecl newname semfdecl typs in
+    (* the part below is copied to check_if_fun_needs_reparse *)
+    (* so any changes made here must be also done there *)
+    let abody = StringMap.find semfdecl.semfname !fun_abodies in
+    parsed_funs := StringMap.add newsemfdecl.semfname newsemfdecl !parsed_funs;
     let newsembody = convert_stmts abody in 
-    let newrtype = get_typ_from_fun_sembody semfdecl.semfname newsembody in
-    if newrtype == Undefined then
-    raise(Failure("cant determine fun "^semfdecl.semfname^" return type (mutual recursion?)"))
-    else (
+    let newrtype = get_typ_from_fun_sembody newsemfdecl.semfname newsembody in
+    if newrtype == Undefined then (
+    ignore(Stack.pop fun_parser_stack);
+    (funs_to_reparse := (newsemfdecl.semfname) :: (!funs_to_reparse) )
+    ) else (
       let newnewsemfdecl = { newsemfdecl with
         sembody = newsembody;
         rtyp = newrtype;
-        parsed = true;
       } in
-      fun_decls := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !fun_decls;
+      parsed_funs := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !parsed_funs;
       ignore(Stack.pop fun_parser_stack);
       ()
     )
   )
 
-and handle_scall (name : string) (typs : typ list) : unit =
-  if (StringMap.mem name !fun_decls)
-  then
-    let semfdecl = StringMap.find name !fun_decls in
-    if semfdecl.parsed then
-      if (validate_param_typs semfdecl.semformals typs)
-      then ()
-      else raise(Failure ("fun "^name^" param types mismatch"))
-    else
-      if ( (List.length typs) == (List.length semfdecl.semformals) )
-      then parse_semfdecl semfdecl typs
-      else raise (Failure ("fun "^name^" call has wrong number of param"))
-    (* ignore(check_if_call_expectations_match name semexprs) *)
-  else
-    raise( Failure ("fun "^name^" used but never declared"))
-    (* fun_expectations := StringMap.add name (List.map get_expr_typ semexprs) !fun_expectations;; *)
+
+and handle_scall (name : string) (typs : typ list) : string =
+  let newname = generate_fun_name name typs in (
+    if (StringMap.mem newname !parsed_funs)
+    then ()
+    else (
+      if (StringMap.mem name built_in_decls) then
+      raise(Failure("builtin fun "^name^" does not accept such params"))
+      else
+        if StringMap.mem name !fun_decls then (
+          let semfdecl = StringMap.find name !fun_decls in
+          if ( (List.length typs) == (List.length semfdecl.semformals) )
+          then parse_semfdecl newname semfdecl typs
+          else raise (Failure ("fun "^name^" call has wrong number of param"))
+        ) else raise( Failure ("fun "^name^" used but never declared"))
+    )
+  ); newname
 
 and convert_obj (o : obj) : sem_obj = match o with
     Id(id) -> SId(id)
   | _ -> raise(Failure("convert_obj case not implemented"))
 
+(*
+and str_of_obj = function
+Id(s) -> s
+*)
+
 and convert_expr (exp : expr) : sem_expr = match exp with
     Literal(i) -> SLiteral(i)
   | StrLit(s) ->  SStrLit(s)
+  | FloatLit(f) -> SFloatLit(f)
+  | BoolLit(b) -> SBoolLit(b)
   | Assign(o,e) -> convert_assign o e
-  | Call(s,lst) -> (let exprs = convert_exprs lst in
-          (handle_scall s (List.map get_expr_typ exprs) );
-          SCall(s,exprs) )
+  | Binop(e1,op,e2) -> 
+    let seme1 = convert_expr e1 in let seme2 = convert_expr e2 in
+    if is_logical_op op
+    then raise(Failure("logical op not implemented"))
+    else let e1typ = get_expr_typ seme1 in let e2typ = get_expr_typ seme2 in
+      if e1typ = String then 
+        if e2typ = String && op = Add
+        then SBinop(String,seme1,op,seme2)
+        else raise(Failure("Invalid string operation"))
+      else if e2typ = String then 
+        if e1typ = String && op = Add
+        then SBinop(String,seme1,op,seme2)
+        else raise(Failure("Invalid string operation"))
+      else if e1typ = Bool || e2typ = Bool
+        then raise(Failure("logical expression inside arithmetic expression"))
+      else
+        let resulttyp = if e1typ = Float || e2typ = Float
+          then Float else Int in
+        SBinop(resulttyp,seme1,op,seme2)
+  | Call(s,lst) -> ( (* (print_string("_"^s^"_in "^(Stack.top fun_parser_stack)^"\n"); *)
+          let exprs = convert_exprs lst in 
+          let typs = (List.map get_expr_typ exprs) in
+          let funname = (handle_scall s typs ) in
+          SCall(funname,exprs) )
   | Obj(o) -> SObj(convert_obj o)
   | Noexpr -> SNoexpr
   | _ -> raise( Failure ("convert_expr case not implemented"))
-and convert_exprs (exps : expr list) : sem_expr list = match exps with
-    e :: l -> (convert_expr e) :: (convert_exprs l)
-  | [] -> []
+
+and convert_exprs exps = (List.map convert_expr exps)
+
 
 and convert_stmt stmt = match stmt with
     Block(lst) -> SBlock(convert_stmts lst)
-  | Expr(exp) -> SExpr(convert_expr exp)
-  | Return(exp) -> SReturn(convert_expr exp)
+  | Expr(exp) -> (* print_string("E_in "^(Stack.top fun_parser_stack)^"\n"); *)
+      SExpr(convert_expr exp)
+  | Return(exp) -> (* print_string("R_in "^(Stack.top fun_parser_stack)^"\n"); *)
+      SReturn(convert_expr exp)
   | If(exp,s1,s2) -> SIf(convert_expr exp, convert_stmt s1, convert_stmt s2)
   | _ ->  raise( Failure ("convert_stmt case not implemented"))
 
-and convert_stmts stmts = match stmts with
-    s :: l -> (convert_stmt s) :: (convert_stmts l)
-  | [] -> []
+and convert_stmts stmts = (List.map convert_stmt stmts)
+
 
 and convert_assign o e = (
+  (* print_string("converting "^(get_string_of_sem_obj (convert_obj o) )^"\n"); *)
   let semexpr = convert_expr e in
   let semobj = convert_obj o in
   let expr_typ = (get_expr_typ semexpr) in
   if (Stack.top fun_parser_stack) = "_global_"
   then (
     if StringMap.mem (get_string_of_sem_obj semobj) !globals
+    (* outside function, global environment *)
     then (
       let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !globals in
-      if expectedtyp == get_expr_typ semexpr
-      then SAssign(expr_typ,semobj, semexpr)
+      if expectedtyp == get_expr_typ semexpr || (expectedtyp = Float && (get_expr_typ semexpr) = Int)
+        then SAssign(expr_typ,semobj, semexpr)
+      else if (expectedtyp = Int && expr_typ = Float)
+        then ( add_id_to_map globals semobj expr_typ;
+        SAssign(Float,semobj, semexpr) )
       else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
     ) else ( add_id_to_map globals semobj expr_typ;
     SAssign(expr_typ,semobj, semexpr)
     )
   ) else (
-    let semfdecl = StringMap.find (Stack.top fun_parser_stack) !fun_decls in
+    (* inside function, local environment *)
+    let semfdecl = StringMap.find (Stack.top fun_parser_stack) !parsed_funs in
     if StringMap.mem (get_string_of_sem_obj semobj) !(semfdecl.semlocals)
+    (* check if it is a local variable *)
     then (
       let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !(semfdecl.semlocals) in
-      if expectedtyp == get_expr_typ semexpr
-      then SAssign(expr_typ,semobj, semexpr)
+      if expectedtyp == get_expr_typ semexpr || (expectedtyp = Float && expr_typ = Int)
+        then SAssign(expr_typ,semobj, semexpr)
+      else if (expectedtyp = Int && expr_typ = Float)
+        then ( (add_id_to_map (semfdecl.semlocals) semobj expr_typ);
+        SAssign(Float,semobj, semexpr) )
       else raise(Failure("cant change var "^(get_string_of_sem_obj semobj)^" type"))
     ) else (
+      (* check if it is a global *)
       if StringMap.mem (get_string_of_sem_obj semobj) !globals
       then (
         let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !globals in
-        if expectedtyp == get_expr_typ semexpr
-        then SAssign(expr_typ,semobj, semexpr)
+        if expectedtyp == get_expr_typ semexpr  || (expectedtyp = Float && expr_typ = Int)
+          then SAssign(expr_typ,semobj, semexpr)
+        else if (expectedtyp = Int && expr_typ = Float)
+          then (add_id_to_map globals semobj expr_typ;
+          SAssign(Float,semobj, semexpr) )
         else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
+        (* if not local or global, create new local var *)
       ) else ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
       SAssign(expr_typ,semobj, semexpr)
       )
@@ -225,10 +338,10 @@ let create_fun_decl fd =
   (* let body = convert_stmts fd.body in
   let rettyp = (get_typ_from_fun_sembody fd.fname body) in *)
   fun_abodies := StringMap.add fd.fname fd.body !fun_abodies;
-  let semfdecl = { funid = (let id = !fun_count in (fun_count := !fun_count + 1); id);
-   parsed = false;
+  let semfdecl = {
    rtyp = Undefined;
    semfname = fd.fname;
+   originalname = fd.fname;
    semformals = (convert_ids_to_undef_typed_ids fd.formals);
    semlocals = ref StringMap.empty;
    sembody = []; } in
@@ -255,17 +368,61 @@ let rec remove_formals_from_locals formals map = match formals with
 let fun_map_to_list_fold_helper k v l =
   (* print_string ("function: "^(string_of_typ v.rtyp)^" "^v.semfname^"\n" ); *)
   v.semlocals := remove_formals_from_locals v.semformals !(v.semlocals);
-  if (v.funid == -1 || not v.parsed) then l else v::l;;
+  if ( StringMap.mem v.originalname built_in_decls) then l else v::l;;
 
 let globals_map_to_list_fold_helper k v l = (v,k)::l
 
+(*
+let reparse_fun2 name =
+  Stack.push name fun_parser_stack;
+  let semfdecl = StringMap.find name !fun_decls in
+  let abody = StringMap.find name !fun_abodies in
+  let newsembody = convert_stmts abody in
+  let newrtype = get_typ_from_fun_sembody semfdecl.semfname newsembody in
+  if newrtype == Undefined then
+  raise(Failure("could not determine fun "^name^" return type"))
+  else (
+    let newnewsemfdecl = { semfdecl with
+      sembody = newsembody;
+      rtyp = newrtype;
+    } in
+    fun_decls := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !fun_decls;
+    ignore(Stack.pop fun_parser_stack);
+    ()
+  )
+*)
+
+
+let reparse_fun name =
+  Stack.push name fun_parser_stack;
+  let semfdecl = StringMap.find name !parsed_funs in
+  let abody = StringMap.find semfdecl.originalname !fun_abodies in
+  let newsembody = convert_stmts abody in 
+  let newrtype = get_typ_from_fun_sembody semfdecl.originalname newsembody in
+  if newrtype == Undefined then (
+  ignore(Stack.pop fun_parser_stack);
+  raise(Failure("could not determine fun "^name^" return type"))
+  ) else (
+    let newnewsemfdecl = { semfdecl with
+      sembody = newsembody;
+      rtyp = newrtype;
+    } in
+    parsed_funs := StringMap.add newnewsemfdecl.semfname newnewsemfdecl !parsed_funs;
+    ignore(Stack.pop fun_parser_stack);
+    ()
+  )
+
+
 let convert (stmts, decls) =
+  (Stack.push "_global_" fun_parser_stack);
   create_funs_from_decls decls;
   let semstmts = convert_stmts stmts in
+  (List.iter print_string !funs_to_reparse); 
+  (List.iter reparse_fun !funs_to_reparse);
   (
     (StringMap.fold globals_map_to_list_fold_helper !globals []),
     List.rev (semstmts),
-    (StringMap.fold fun_map_to_list_fold_helper !fun_decls []),
+    (StringMap.fold fun_map_to_list_fold_helper !parsed_funs []),
     []
   );;
 

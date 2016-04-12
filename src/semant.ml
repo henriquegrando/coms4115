@@ -1,5 +1,5 @@
 (* Semantic tree generation for the DaMPL translator *)
-(*
+
 open Ast
 open Semt
 

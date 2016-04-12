@@ -1,6 +1,6 @@
 TARFILES = Makefile scanner.mll parser.mly ast.mli calc.ml
 
-OBJS = parser.cmo scanner.cmo semant.cmo semt.cmo codegen.cmo sconv.cmo main.cmo
+OBJS = parser.cmo scanner.cmo semant.cmo semt.cmo builtin.cmo codegen.cmo sconv.cmo main.cmo
 
 dampl : $(OBJS)
 	ocamlc -o dampl $(OBJS)
@@ -34,6 +34,8 @@ semant.cmo: semt.cmo ast.cmo
 semant.cmx: semt.cmx ast.cmx
 codegen.cmo: semt.cmo ast.cmo
 codegen.cmx: semt.cmx ast.cmx
+builtin.cmo: semt.cmo ast.cmo
+builtin.cmx: semt.cmx ast.cmx
 sconv.cmo: semt.cmo ast.cmo
 sconv.cmx: semt.cmx ast.cmx
 parser.cmo: ast.cmo parser.cmi 

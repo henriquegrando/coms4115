@@ -2,17 +2,11 @@ open Ast
 open Semt
 open Stack
 module StringMap = Map.Make(String);;
+open Builtin
 
 let param_separator = "__"
 
 let fun_decls = ref StringMap.empty;;
-
-(*
-let parsed_funs = ref (StringMap.singleton ("print"^param_separator^"str")
-  { rtyp = Void; semfname = ("print"^param_separator^"str");
-    originalname = "print"; semformals = [(String, "x")];
-    semlocals = ref StringMap.empty; sembody = [] } );;
-*)
 
 let fun_abodies = ref StringMap.empty;;
 
@@ -21,23 +15,6 @@ let globals = ref StringMap.empty;;
 let funs_to_reparse = ref [];;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
-
-let built_in_prototypes = [
-  (Void,"print",[
-    [String];
-    [Int];
-    [Float]
-  ])
-];;
-
-let get_built_in_rtyp = function
-    (t,_,_) -> t 
-
-let get_built_in_name = function
-    (_,name,_) -> name 
-
-let get_built_in_formals = function
-    (_,_,formals) -> formals 
 
 let string_of_param_typ = function
     Bool -> "bool"

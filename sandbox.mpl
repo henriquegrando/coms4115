@@ -12,3 +12,7 @@ fun bar(a) {
 
 foo(1);
 foo(1.1);
+
+fun add(a,b) {
+	return a+b;
+}

@@ -12,9 +12,9 @@ type sem_tup = string * typed_id list (* tuple creation *)
 
 type sem_obj = (* lhs *)
     SId of string
-  | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
-  | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
-  | SAttr of string * string (* a$b *)
+  | SBrac of sem_obj * sem_expr (* a[0] a[i] a[i+1] *)
+  | SBrac2 of sem_obj * sem_expr * sem_expr (* a[0:2] *)
+  | SAttr of sem_obj * string (* a$b *)
 and
  sem_expr =
     SLiteral of int

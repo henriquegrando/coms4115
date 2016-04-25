@@ -89,9 +89,13 @@ in_fun_stmt:
 
 obj:
     ID               { Id($1) }
-  | ID DOLLAR ID     { Attr($1,$3) }
-  | ID LBRACK expr RBRACK { Brac($1,$3) }
-  | ID LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
+  | obj LBRACK expr RBRACK { Brac($1,$3) }
+
+
+appended_obj:
+    obj               { $1 }
+  | obj DOLLAR ID     { Attr($1,$3) }
+  | obj LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -103,7 +107,7 @@ expr:
   | STRING           { StrLit($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
-  | obj              { Obj($1) }
+  | appended_obj     { Obj($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -118,7 +122,7 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | obj ASSIGN expr   { Assign($1, $3) }
+  | appended_obj ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
 

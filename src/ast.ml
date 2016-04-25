@@ -11,9 +11,9 @@ type tup = string * string list (* tuple creation *)
 
 type obj = (* lhs *)
     Id of string
-  | Brac of string * expr (* a[0] a[i] a[i+1] *)
-  | Brac2 of string * expr * expr (* a[0:2] *)
-  | Attr of string * string (* a$b *)
+  | Brac of obj * expr (* a[0] a[i] a[i+1] *)
+  | Brac2 of obj * expr * expr (* a[0:2] *)
+  | Attr of obj * string (* a$b *)
 and
  expr =
     Literal of int

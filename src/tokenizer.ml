@@ -67,8 +67,10 @@ let string_of_token tk = match tk with
   | LITERAL(_) -> "LITERAL"
   | ID(_) -> "ID"
   | TID(_) -> "TID"
+  | MID(_) -> "MID"
   | FLOAT(_) -> "FLOAT"
   | STRING(_) -> "STRING"
+  | DOT -> "DOT"
   | EOF -> "EOF";;
 
 let rec string_of_tokens tks = match tks with

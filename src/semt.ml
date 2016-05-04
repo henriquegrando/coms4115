@@ -2,8 +2,6 @@
 
 open Ast
 
-type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string | Table of string | Array of typ
-
 module StringMap = Map.Make(String);;
 
 type typed_id = typ * string
@@ -15,6 +13,7 @@ type sem_obj = (* lhs *)
   | SBrac of sem_obj * sem_expr (* a[0] a[i] a[i+1] *)
   | SBrac2 of sem_obj * sem_expr * sem_expr (* a[0:2] *)
   | SAttr of sem_obj * string (* a$b *)
+  | SAttrInx of sem_obj * string (* *)
 and
  sem_expr =
     SLiteral of int
@@ -30,8 +29,7 @@ and
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
   | STupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
-  | SArr of sem_expr list (* arrays e.g. [1,2,3] *)
-  | SDict of sem_expr list * sem_expr list (* dicts *)
+  | SArr of typ * sem_expr list (* arrays e.g. [1,2,3] *)
   | SNoexpr
  
 

@@ -14,7 +14,6 @@ fun bar(a) {
 
 b=1;
 bar(1.1);
-/* foo(bar(1)); */
 
 fun lastone() {
 	print("bye!\n");

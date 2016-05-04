@@ -16,6 +16,8 @@ let funs_to_reparse = ref [];;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
 
+let tup_decls = ref StringMap.empty;;
+
 let string_of_param_typ = function
     Bool -> "bool"
   | Int -> "int"
@@ -83,7 +85,10 @@ let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
   | SBoolLit(_) -> Bool
   | SObj(o) -> get_obj_typ o
   | SBinop(t,_,_,_) -> t
+  | SUnop(t,_,_) -> t
   | SCall(name,_) -> (StringMap.find name !parsed_funs).rtyp
+  | STupInst(tupname) -> Tuple(tupname)
+  | STabInst(tupname) -> Table(tupname)
   | SNoexpr | _ -> Void
 ;; 
 
@@ -222,6 +227,16 @@ and convert_expr (exp : expr) : sem_expr = match exp with
           let funname = (handle_scall s typs ) in
           SCall(funname,exprs) )
   | Obj(o) -> SObj(convert_obj o)
+  | TupInst(tup) -> (
+      if StringMap.mem tup !tup_decls
+      then STupInst(tup)
+      else raise(Failure("tuple"^tup^" never declared"))
+    )
+  | TabInst(tup) -> (
+      if StringMap.mem tup !tup_decls
+      then STabInst(tup)
+      else raise(Failure("tuple"^tup^" never declared"))
+    )
   | Noexpr -> SNoexpr
   | _ -> raise( Failure ("convert_expr case not implemented"))
 
@@ -389,8 +404,22 @@ let reparse_fun name =
     ()
   )
 
+let create_tup_decl tdecl =
+  let create_tup_item inx item = 
+    (tup_decls := StringMap.add (fst tdecl) (Tuple("")) !tup_decls);
+    (tup_decls := StringMap.add ((fst tdecl)^"$"^(snd item)) (fst item) !tup_decls);
+    (tup_decls := StringMap.add ((fst tdecl)^"$"^(string_of_int inx)) (fst item) !tup_decls);
+    () 
+  in List.iteri create_tup_item (snd tdecl) ;;
+
+let create_tups_from_decls decls = match decls with
+    Func(_)::l -> create_funs_from_decls l
+  | Tup(t)::l -> create_tup_decl t; create_funs_from_decls l
+  | [] -> ();;
+
 
 let convert (stmts, decls) =
+  create_tups_from_decls decls;
   (Stack.push "_global_" fun_parser_stack);
   create_funs_from_decls decls;
   let semstmts = convert_stmts stmts in

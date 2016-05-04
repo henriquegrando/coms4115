@@ -9,6 +9,7 @@ open Ast
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE
 %token INCLUDE TUPLE DOLLAR BREAK CONTINUE FUN IN
+%token REAL INTEGER TEXT
 %token <int> LITERAL
 %token <float> FLOAT
 %token <string> STRING
@@ -29,12 +30,24 @@ open Ast
 
 
 %start program
-%type <Ast.program> program
+%type <Ast.program_with_headers> program
 
 %%
 
 program:
-  decls EOF { $1 }
+  program_with_headers EOF { $1 }
+
+program_with_headers:
+    includs decls { $1, $2 }
+  | decls { [], ($1) }
+
+includs:
+    includs includ  { $2 :: $1 }
+  | includ { [$1] }
+
+includ:
+    INCLUDE TID SEMI { StdIncl($2) }
+  | INCLUDE STRING SEMI { FileIncl($2) }
 
 decls:
    /* nothing */ { [], [] }
@@ -53,7 +66,20 @@ fdecl:
 	 body = List.rev $7 }) }
 
 tdecl:
-  TUPLE TID LBRACE formal_list RBRACE { Tup($2, $4) }
+  TUPLE TID LBRACE tup_item_list RBRACE { Tup($2, $4) }
+
+tup_item_list:
+    tup_item                   { [$1] }
+  | tup_item_list COMMA tup_item { $3 :: $1 }
+
+tup_item:
+    ID      { (String, $1) }
+  | ID COLON tup_typ { ($3, $1) }
+
+tup_typ:
+    INTEGER   { Int }
+  | REAL      { Float }
+  | TEXT      { String }
 
 formals_opt:
     /* nothing */ { [] }
@@ -91,10 +117,11 @@ obj:
     ID               { Id($1) }
   | obj LBRACK expr RBRACK { Brac($1,$3) }
 
-
 appended_obj:
     obj               { $1 }
   | obj DOLLAR ID     { Attr($1,$3) }
+  | obj DOLLAR LPAREN ID RPAREN     { AttrInx($1,$4) }
+  | obj DOLLAR LPAREN LITERAL RPAREN     { AttrInx($1,(string_of_int $4)) }
   | obj LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
 
 expr_opt:

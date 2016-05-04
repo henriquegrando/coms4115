@@ -8,6 +8,7 @@ let built_in_prototypes = [
     [Float]
   ]);
   (String,"str",[
+    [String];
     [Int];
     [Float];
   ]);

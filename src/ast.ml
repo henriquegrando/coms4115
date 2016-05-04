@@ -1,19 +1,25 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
+
+type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string | Table of string | Array of typ
+
+
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
 type uop = Neg | Not
 
 
+type tupitem = typ * string
 
-type tup = string * string list (* tuple creation *)
+type tup = string * tupitem list (* tuple creation *)
 
 type obj = (* lhs *)
     Id of string
   | Brac of obj * expr (* a[0] a[i] a[i+1] *)
   | Brac2 of obj * expr * expr (* a[0:2] *)
   | Attr of obj * string (* a$b *)
+  | AttrInx of obj * string (* a$(0) *)
 and
  expr =
     Literal of int
@@ -29,7 +35,6 @@ and
   | TabInst of string (* table instantiation e.g. Foo[] *)
   | TupInit of string * expr list (* tuple init e.g. Foo{1,2,"abc"} *)
   | Arr of expr list (* arrays e.g. [1,2,3] *)
-  | Dict of expr list * expr list (* dicts *)
   | Noexpr
 
 type stmt =
@@ -60,6 +65,12 @@ type program_decl =
   | Tup of tup
 
 type program = stmt list * program_decl list
+
+type includ = 
+    StdIncl of string
+  | FileIncl of string
+
+type program_with_headers = includ list * program
 
 (* Pretty-printing functions *)
 (*

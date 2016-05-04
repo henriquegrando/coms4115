@@ -54,6 +54,10 @@ rule token = parse
 | "fun"      { FUN }
 | "in"       { IN }
 
+| "real"	 { REAL }
+| "integer"  { INTEGER }
+| "text"	 { TEXT }
+
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | (decimal exponent?)|(digit+exponent) as lxm { FLOAT(float_of_string lxm) }
 | '"'([^'"']|("\\\""))*'"' as lxm { STRING(lxm) }

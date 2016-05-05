@@ -16,7 +16,11 @@ let funs_to_reparse = ref [];;
 
 let fun_parser_stack = (Stack.create () : string Stack.t);;
 
+let loop_stack = (Stack.create () : int Stack.t);;
+
 let tup_decls = ref StringMap.empty;;
+
+(* let tup_sizes = ref StringMap.empty;; *)
 
 let rec string_of_param_typ = function
     Bool -> "bool"
@@ -94,7 +98,7 @@ let rec get_obj_typ (o : sem_obj) : typ = match o with
       if fname = "_global_"
       then if StringMap.mem id !globals
         then StringMap.find id !globals
-        else raise(Failure("var "^id^" not found"))
+        else raise(Failure("global "^id^" not found"))
       else get_id_typ_from_locals_or_globals id fname
   | SBrac(o,e,i) ->
       let otyp = get_obj_typ o in
@@ -188,6 +192,10 @@ let rec check_if_exists_in_stack stack str =
     then true
     else check_if_exists_in_stack stack str;;
 
+let handle_special_function (name : string) (typs : typ list) : sem_expr =
+  match name with
+  _ -> SNoexpr (* No special behavior *)
+
 let rec add_id_to_map mapref semobj expr_typ =
   (* print_string("adding "^(get_string_of_sem_obj semobj)^" "^(string_of_param_typ expr_typ)^"\n"); *)
   ( match expr_typ with
@@ -206,6 +214,7 @@ let rec parse_semfdecl newname semfdecl typs =
     (funs_to_reparse := callername :: (!funs_to_reparse) )
   else (
     Stack.push newname fun_parser_stack;
+    Stack.push 0 loop_stack;
     let newsemfdecl = update_formal_typs_in_semfdecl newname semfdecl typs in
     (* the part below is copied to check_if_fun_needs_reparse *)
     (* so any changes made here must be also done there *)
@@ -215,6 +224,7 @@ let rec parse_semfdecl newname semfdecl typs =
     let newrtype = get_typ_from_fun_sembody newsemfdecl.semfname newsembody in
     if newrtype == Undefined then (
     ignore(Stack.pop fun_parser_stack);
+    ignore(Stack.pop loop_stack);
     (funs_to_reparse := (newsemfdecl.semfname) :: (!funs_to_reparse) )
     ) else (
       let newnewsemfdecl = { newsemfdecl with
@@ -299,7 +309,7 @@ and convert_obj (o : obj) : sem_obj = match o with
         | Tuple(x) -> SAttrInx(String,semo,semexpr)
         | _ -> raise(Failure("cant get attr of item that is not tuple or table"))
       ) else raise(Failure("attribute index must be integer")) 
-  | _ -> raise(Failure("convert_obj case not implemented"))
+  (* | _ -> raise(Failure("convert_obj case not implemented")) *)
 
 (*
 and str_of_obj = function
@@ -362,8 +372,12 @@ and convert_expr (exp : expr) : sem_expr = match exp with
   | Call(s,lst) -> ( (* (print_string("_"^s^"_in "^(Stack.top fun_parser_stack)^"\n"); *)
           let exprs = convert_exprs lst in 
           let typs = (List.map get_expr_typ exprs) in
-          let funname = (handle_scall s typs ) in
-          SCall(funname,exprs) )
+          (* veirifies if it is a special function *)
+          let sbexpr = handle_special_function s typs in
+          if sbexpr = SNoexpr then
+            let funname = (handle_scall s typs ) in
+            SCall(funname,exprs) 
+          else sbexpr )
   | Obj(o) -> SObj(convert_obj o)
   | TupInst(tup) -> (
       if StringMap.mem tup !tup_decls
@@ -396,8 +410,43 @@ and convert_stmt stmt = match stmt with
       SExpr(convert_expr exp)
   | Return(exp) -> (* print_string("R_in "^(Stack.top fun_parser_stack)^"\n"); *)
       SReturn(convert_expr exp)
-  | If(exp,s1,s2) -> SIf(convert_expr exp, convert_stmt s1, convert_stmt s2)
-  | _ ->  raise( Failure ("convert_stmt case not implemented"))
+  | If(exp,s1,s2) ->
+      let semexpr = convert_expr exp in
+      let typ = get_expr_typ semexpr in
+      if typ = Bool || typ = Int then
+        SIf(semexpr, convert_stmt s1, convert_stmt s2)
+      else raise(Failure("invalid if condition"))
+  | While(exp,stmt) -> 
+      (let loopcount = (Stack.pop loop_stack) in Stack.push (loopcount+1) loop_stack);
+      let semexpr = convert_expr exp in
+      let typ = get_expr_typ semexpr in
+      if typ = Bool || typ = Int then (
+        let ret = SWhile(semexpr, convert_stmt stmt) in
+        (let loopcount = (Stack.pop loop_stack) in (Stack.push (loopcount-1) loop_stack));
+        ret )
+      else raise(Failure("invalid while condition"))
+  | For(id,expr,stmt) -> (
+      (let loopcount = (Stack.pop loop_stack) in Stack.push (loopcount+1) loop_stack);
+      let semexpr = convert_expr expr in
+      let typ = get_expr_typ semexpr in
+      let value = match typ with
+          Array(t) -> (
+            let mapref = if (Stack.top fun_parser_stack) = "_global_"
+            then globals else (StringMap.find (Stack.top fun_parser_stack) !parsed_funs).semlocals in
+            let return = (mapref := (StringMap.add id t !mapref)); SFor(id,semexpr, convert_stmt stmt) in
+            (mapref := (StringMap.remove id !mapref)); return )
+        | Table(t) -> (
+            let mapref = if (Stack.top fun_parser_stack) = "_global_"
+            then globals else (StringMap.find (Stack.top fun_parser_stack) !parsed_funs).semlocals in
+            let return = (mapref := (StringMap.add id (Tuple(t)) !mapref)); SFor(id,semexpr, convert_stmt stmt) in
+            (mapref := (StringMap.remove id !mapref)); return )
+        | _ -> raise(Failure("cant make for on non iterable"))
+       in (let loopcount = (Stack.pop loop_stack) in (Stack.push (loopcount-1) loop_stack)); value )
+  | Break -> if (Stack.top loop_stack) > 0
+    then SBreak else raise(Failure("cannot use break out of loop"))
+  | Continue -> if (Stack.top loop_stack) > 0
+    then SContinue else raise(Failure("cannot use continue out of loop"))
+  (* | _ ->  raise( Failure ("convert_stmt case not implemented")) *)
 
 and convert_stmts stmts = (List.map convert_stmt stmts)
 
@@ -582,13 +631,14 @@ let rec create_tups_from_decls decls = match decls with
 let convert (stmts, decls) =
   create_tups_from_decls decls;
   (Stack.push "_global_" fun_parser_stack);
+  (Stack.push 0 loop_stack);
   create_funs_from_decls decls;
   let semstmts = convert_stmts stmts in
   (* (List.iter print_string !funs_to_reparse); *)
   (List.iter reparse_fun !funs_to_reparse);
   (
     (StringMap.fold globals_map_to_list_fold_helper !globals []),
-    List.rev (semstmts),
+    semstmts,
     (StringMap.fold fun_map_to_list_fold_helper !parsed_funs []),
     []
   );;

@@ -1,13 +1,16 @@
-tuple Tup{a:real,b,c:integer}
+a=1;
 
 fun foo() {
-	a=[1,3,7];
+	b=[1,2,3];
+	for i in b {
+		print(i);
+
+	}
+
 	
-	@a[1] = 5;
-
-	a=[1,2];
-
 }
 
+
 foo();
+
 

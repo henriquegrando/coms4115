@@ -51,8 +51,8 @@ includ:
 
 decls:
    /* nothing */ { [], [] }
- | decls stmt { ($2 :: fst $1), snd $1 }
- | decls tdecl_or_fdecl { fst $1, ($2 :: snd $1) }
+ | stmt decls { ($1 :: fst $2), snd $2 }
+ | tdecl_or_fdecl decls { fst $2, ($1 :: snd $2) }
 
 tdecl_or_fdecl:
     fdecl { $1 }
@@ -98,9 +98,11 @@ stmt:
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR ID IN expr LBRACE stmt RBRACE { For($2, $4, $6) }
+  | FOR ID IN expr stmt { For($2, $4, $5) }
   | FOR ID IN expr COLON stmt { For($2, $4, $6) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+  | BREAK SEMI { Break }
+  | CONTINUE SEMI { Continue }
 
 in_fun_stmt_list:
     /* nothing */  { [] }
@@ -110,8 +112,6 @@ in_fun_stmt:
     stmt { $1 }
   | RETURN SEMI { Return Noexpr }
   | RETURN expr SEMI { Return $2 }
-  | BREAK { Break }
-  | CONTINUE { Continue }
 
 obj:
     ID               { Id($1) }

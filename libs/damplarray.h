@@ -12,9 +12,9 @@ typedef struct
     void (*get) (Array, int);
 }Array;
 
-/* Array constructor for every type*/
+/* Array constructor for every type */
 
-Array dampl_arr_new__arr (Array *);
+Array dampl_arr_new__arr (Array);
 
 Array dampl_arr_new__int (int *);
 

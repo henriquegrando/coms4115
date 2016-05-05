@@ -16,10 +16,10 @@ type tup = string * tupitem list (* tuple creation *)
 
 type obj = (* lhs *)
     Id of string
-  | Brac of obj * expr (* a[0] a[i] a[i+1] *)
+  | Brac of obj * expr * bool (* a[0] a[i] a[i+1] *)
   | Brac2 of obj * expr * expr (* a[0:2] *)
   | Attr of obj * string (* a$b *)
-  | AttrInx of obj * string (* a$(0) *)
+  | AttrInx of obj * expr (* a$(0) *)
 and
  expr =
     Literal of int

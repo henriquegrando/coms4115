@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA COLON
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA COLON AT
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE
@@ -66,7 +66,7 @@ fdecl:
 	 body = List.rev $7 }) }
 
 tdecl:
-  TUPLE TID LBRACE tup_item_list RBRACE { Tup($2, $4) }
+  TUPLE TID LBRACE tup_item_list RBRACE { Tup($2, List.rev $4) }
 
 tup_item_list:
     tup_item                   { [$1] }
@@ -115,14 +115,20 @@ in_fun_stmt:
 
 obj:
     ID               { Id($1) }
-  | obj LBRACK expr RBRACK { Brac($1,$3) }
+  | obj LBRACK expr RBRACK { Brac($1,$3,false) }
 
 appended_obj:
     obj               { $1 }
   | obj DOLLAR ID     { Attr($1,$3) }
-  | obj DOLLAR LPAREN ID RPAREN     { AttrInx($1,$4) }
-  | obj DOLLAR LPAREN LITERAL RPAREN     { AttrInx($1,(string_of_int $4)) }
+  | obj DOLLAR LPAREN expr RPAREN     { AttrInx($1,$4) }
   | obj LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
+
+lhs_appended_obj:
+    appended_obj      { $1 }
+  | AT obj LBRACK expr RBRACK { Brac($2,$4,true) }
+
+/* | obj DOLLAR LPAREN LITERAL RPAREN     { AttrInx($1, Literal($4) ) } */
+  
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -149,8 +155,11 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | appended_obj ASSIGN expr   { Assign($1, $3) }
+  | lhs_appended_obj ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+  | TID { TupInst($1) }
+  | TID LBRACK RBRACK { TabInst($1) }
+  | LBRACK actuals_opt RBRACK { Arr($2) }
   | LPAREN expr RPAREN { $2 }
 
 actuals_opt:

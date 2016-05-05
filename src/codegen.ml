@@ -120,7 +120,7 @@ let string_of_fdecl fdecl =
 
 let string_of_program (globals, statements, functions, tuples) = 
   "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
-  "#include \"damplio.h\"\n\n" ^
+  "#include \"dampllib.h\"\n\n" ^
   String.concat "" (List.map string_of_global globals) ^ "\n" ^
   String.concat "" (List.map fdecl_prototype functions) ^ "\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^

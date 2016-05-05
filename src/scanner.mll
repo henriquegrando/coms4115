@@ -20,6 +20,7 @@ rule token = parse
 | ':'	   { COLON }
 | ';'      { SEMI }
 | ','      { COMMA }
+| '@'	   { AT }
 | '+'      { PLUS }
 | '-'      { MINUS }
 | '*'      { TIMES }

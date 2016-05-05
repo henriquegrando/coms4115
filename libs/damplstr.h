@@ -4,6 +4,6 @@
 
 typedef char* String;
 
-String concat(String s1, String s2) ;
+String dampl_str_concat(String s1, String s2) ;
 
 #endif

@@ -9,7 +9,7 @@ typedef struct
     int size;
     void (*insert) (Array *, int, void *);
     void (*append) (Array *, void *);
-    void (*get) (Array, void *);
+    void (*get) (Array, int);
 }Array;
 
 /* Array constructor for every type*/
@@ -59,9 +59,5 @@ float dampl_arr_get__float (Array, int);
 String dampl_arr_get__str (Array, int);
 
 //Tuple dampl_arr_get__tup (Array, int);
-
-
-
-
 
 #endif

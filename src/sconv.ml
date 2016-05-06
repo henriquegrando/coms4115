@@ -82,8 +82,8 @@ let get_id_typ_from_locals_or_globals id fname =
 let rec get_string_of_sem_obj semobj = match semobj with
     SId(id) -> id
   | SBrac(o,_,_) -> (get_string_of_sem_obj o)^"*"
-  | SAttr(_,o,attr) -> (get_string_of_sem_obj o)^"$"
-  | SAttrInx(_,o,_) -> (get_string_of_sem_obj o)^"$$"
+  | SAttr(_,_,o,attr) -> (get_string_of_sem_obj o)^"$"
+  | SAttrInx(_,_,o,_) -> (get_string_of_sem_obj o)^"$$"
   | _ -> raise(Failure("get_string_of_sem_obj case not implemented"))
 
 let is_collection_access (obj : sem_obj) : bool =
@@ -114,8 +114,8 @@ let rec get_obj_typ (o : sem_obj) : typ = match o with
       | Array(x) -> Array(x)
       | _ -> raise(Failure("cant get elem of non collection object"))
     )
-  | SAttr(t,o,attr) -> t
-  | SAttrInx(t,o,attr) -> t
+  | SAttr(_,t,o,attr) -> t
+  | SAttrInx(_,t,o,attr) -> t
 (*
       let otyp = get_obj_typ o in (
       match otyp with
@@ -288,13 +288,13 @@ and convert_obj (o : obj) : sem_obj = match o with
             if StringMap.mem (x^"$"^attr) !tup_decls
             then StringMap.find (x^"$"^attr) !tup_decls
             else raise(Failure(x^"$"^attr^" doesnt exist"))
-          in SAttr(Array(t),semo,attr)
+          in SAttr(Table(x),Array(t),semo,attr)
       | Tuple(x) ->
           let t =
             if StringMap.mem (x^"$"^attr) !tup_decls
             then StringMap.find (x^"$"^attr) !tup_decls
             else raise(Failure(x^"$"^attr^" doesnt exist"))
-          in SAttr(t,semo,attr)
+          in SAttr(Tuple(x),t,semo,attr)
       | _ -> raise(Failure("cant get attr of item that is not tuple or table"))
     ) 
   | AttrInx(o,expr) ->
@@ -305,8 +305,8 @@ and convert_obj (o : obj) : sem_obj = match o with
       if etyp = Int
       then (
         match otyp with
-          Table(x) -> SAttrInx(Array(String),semo,semexpr)
-        | Tuple(x) -> SAttrInx(String,semo,semexpr)
+          Table(x) -> SAttrInx(Table(x),Array(String),semo,semexpr)
+        | Tuple(x) -> SAttrInx(Tuple(x),String,semo,semexpr)
         | _ -> raise(Failure("cant get attr of item that is not tuple or table"))
       ) else raise(Failure("attribute index must be integer")) 
   (* | _ -> raise(Failure("convert_obj case not implemented")) *)

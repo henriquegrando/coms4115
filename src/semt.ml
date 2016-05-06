@@ -12,8 +12,11 @@ type sem_obj = (* lhs *)
     SId of string
   | SBrac of sem_obj * sem_expr * bool (* a[0] a[i] a[i+1] *)
   | SBrac2 of sem_obj * sem_expr * sem_expr (* a[0:2] *)
-  | SAttr of typ * sem_obj * string (* a$b *)
-  | SAttrInx of typ * sem_obj * sem_expr (* TREAT AS STRING *)
+  (* first typ is the type of the object (tuple or table of something) *)
+  (* second typ is the type of the attribute *)
+  | SAttr of typ * typ * sem_obj * string (* a$b *)
+  (* e.g. in a$b 1st typ is typ of a and 2nd is typ of attr b*)
+  | SAttrInx of typ * typ * sem_obj * sem_expr (* TREAT AS STRING *)
 and
  sem_expr =
     SLiteral of int

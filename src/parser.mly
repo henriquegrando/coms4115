@@ -98,7 +98,7 @@ stmt:
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR ID IN expr stmt { For($2, $4, $5) }
+  | FOR ID IN expr LBRACE stmt_list RBRACE { For($2, $4, Block($6)) }
   | FOR ID IN expr COLON stmt { For($2, $4, $6) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | BREAK SEMI { Break }
@@ -122,17 +122,20 @@ appended_obj:
   | obj DOLLAR ID     { Attr($1,$3) }
   | obj DOLLAR LPAREN expr RPAREN     { AttrInx($1,$4) }
   | obj LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
+  | obj LBRACK RBRACK { Brac($1,Noexpr,false) }
 
 lhs_appended_obj:
     appended_obj      { $1 }
   | AT obj LBRACK expr RBRACK { Brac($2,$4,true) }
 
+
 /* | obj DOLLAR LPAREN LITERAL RPAREN     { AttrInx($1, Literal($4) ) } */
   
-
+/*
 expr_opt:
-    /* nothing */ { Noexpr }
+     { Noexpr }
   | expr          { $1 }
+*/
 
 expr:
     LITERAL          { Literal($1) }

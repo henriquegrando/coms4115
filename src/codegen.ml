@@ -95,7 +95,12 @@ and string_of_expr = function
   | SStrLit(s) -> s
   | SObj(o) -> string_of_obj o
   | SBinop(t, e1, o, e2) -> ( match t with
-        String -> "dampl_str_concat("^ string_of_expr e1 ^ "," ^ string_of_expr e1 ^ ")"
+        String -> (match o with
+            Add -> "( dampl_str_concat("^ string_of_expr e1 ^ "," ^ string_of_expr e1 ^ ") )"
+          | Equal | Neq | Less | Leq | Greater | Geq ->
+              "( strcmp("^ string_of_expr e1 ^ "," ^ string_of_expr e1 ^ ") "^string_of_op o^" 0 )"
+          | _ -> raise(Failure("String operation translation failure"))
+      )
       | _ -> "(" ^ string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ")"
     )
   | SUnop(t, o, e) -> "(" ^ string_of_uop o ^ string_of_expr e ^ ")"
@@ -129,6 +134,8 @@ and string_of_expr = function
   )
   | SCall(f, el) ->
       "dampl_" ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | SSpecialCall(_,f,el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | SArr(t,exprs) -> if (List.length exprs) = 0
       then "dampl_arr_new()"
       else (

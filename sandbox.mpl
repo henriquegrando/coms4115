@@ -11,8 +11,9 @@ fun foo() {
 }
 
 fun bar(table) {
+	print(len(table));
 	for t in table {
-		len(table[]);
+		print(len(table[]));
 	}
 }
 

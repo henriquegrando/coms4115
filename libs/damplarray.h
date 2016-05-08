@@ -19,6 +19,8 @@ typedef struct
 
 Array dampl_arr_new();
 
+int dampl_arr_len(Array);
+
 
 //Array dampl_arr_new__tup ();
 

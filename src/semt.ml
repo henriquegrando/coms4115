@@ -42,6 +42,9 @@ and
   | STabInst of string (* table instantiation e.g. Foo[] *)
   | SArr of typ * sem_expr list (* arrays e.g. [1,2,3] *)
   | SNoexpr
+  (* The elements below are internal use only *)
+  (* SpecialCall is an unchecked call, used for hardcode only *)
+  | SSpecialCall of typ * string * sem_expr list
   | SString of string (* For use inside codegen only *)
  
 

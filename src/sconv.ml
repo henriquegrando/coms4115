@@ -174,6 +174,7 @@ let get_expr_typ (exp : sem_expr) : typ = match exp with (* TODO *)
   | STupInst(tupname,_) -> Tuple(tupname)
   | STabInst(tupname) -> Table(tupname)
   | SArr(t,_) -> Array(t)
+  | SSpecialCall(t,_,_) -> t
   | SNoexpr | _ -> Void
 ;; 
 
@@ -607,8 +608,8 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
   (* len call for arrays or tables *)
   "len" -> ( match exprs with
     [Obj(o)] -> ( match (get_obj_typ (convert_obj_checking_side o true)) with
-          Table(_) -> SCall("fun_that_get_table_size",(convert_exprs exprs))
-        | Array(_) -> SCall("fun_that_get_array_size",(convert_exprs exprs))
+          Table(_) -> SSpecialCall(Int,"dampl_arr_len",(convert_exprs exprs))
+        | Array(_) -> SSpecialCall(Int,"dampl_arr_len",(convert_exprs exprs))
         | Tuple(name) -> (SLiteral(StringMap.find name !tup_sizes))
         | _ -> SNoexpr
       )

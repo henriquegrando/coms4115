@@ -14,7 +14,7 @@ typedef struct
 
 Tuple dampl_tup_new (int size);
 
-/* Array insertion method */
+/* Tuple insertion method */
 
 int dampl_tup_set__int(Tuple, int, int);
 

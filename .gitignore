@@ -1,7 +1,7 @@
 .DS_Store
 hello
 dampl
-*.c
+/*.c
 
 *.annot
 *.cmo

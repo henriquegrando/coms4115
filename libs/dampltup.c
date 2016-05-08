@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "dampltup.h"
 
 Tuple dampl_tup_new (int size){

@@ -1,5 +1,6 @@
-#include "damplstr.h"
 #include <string.h>
+#include <stdlib.h>
+#include "damplstr.h"
 
 
 String dampl_str_concat(String s1, String s2) {

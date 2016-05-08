@@ -121,7 +121,7 @@ appended_obj:
     obj               { $1 }
   | obj DOLLAR ID     { Attr($1,$3) }
   | obj DOLLAR LPAREN expr RPAREN     { AttrInx($1,$4) }
-  | obj LBRACK expr COLON expr RBRACK { Brac2($1,$3,$5) }
+  | obj LBRACK expr_opt COLON expr_opt RBRACK { Brac2($1,$3,$5) }
   | obj LBRACK RBRACK { Brac($1,Noexpr,false) }
 
 lhs_appended_obj:
@@ -131,11 +131,11 @@ lhs_appended_obj:
 
 /* | obj DOLLAR LPAREN LITERAL RPAREN     { AttrInx($1, Literal($4) ) } */
   
-/*
+
 expr_opt:
-     { Noexpr }
+    /* Nothing */ { Noexpr }
   | expr          { $1 }
-*/
+
 
 expr:
     LITERAL          { Literal($1) }

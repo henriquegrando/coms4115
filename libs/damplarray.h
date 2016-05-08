@@ -13,59 +13,54 @@ typedef struct
     void (*insert) (Array *, int, void *);
     void (*set) (Array *, int, void *);
     void * (*get) (Array, int);
-}Array;
+} * Array;
 
 /* Array constructor for every type */
 
-Array dampl_arr_new__arr ();
+Array dampl_arr_new();
 
-Array dampl_arr_new__int ();
-
-Array dampl_arr_new__float ();
-
-Array dampl_arr_new__str ();
 
 //Array dampl_arr_new__tup ();
 
 /* Array add method 
    Appends an element in the end of the array */
 
-void dampl_arr_add__arr (Array *, Array);
+void dampl_arr_add__arr (Array, Array);
 
-void dampl_arr_add__int (Array *, int);
+int dampl_arr_add__int (Array, int);
 
-void dampl_arr_add__float (Array *, float);
+float dampl_arr_add__float (Array, float);
 
-void dampl_arr_add__str (Array *, String);
+String dampl_arr_add__str (Array, String);
 
-//void dampl_arr_add__tup (Array *, Array);
+Tuple dampl_arr_add__tup (Array, Tuple);
 
 
 /* Array insertion method 
    Insert an element in a given position, shifting all elements after it */
 
-void dampl_arr_insert__arr (Array *, int, Array);
+Array dampl_arr_insert__arr (Array, int, Array);
 
-void dampl_arr_insert__int (Array *, int, int);
+int dampl_arr_insert__int (Array, int, int);
 
-void dampl_arr_insert__float (Array *, int, float);
+float dampl_arr_insert__float (Array, int, float);
 
-void dampl_arr_insert__str (Array *, int, String);
+String dampl_arr_insert__str (Array, int, String);
 
-//void dampl_arr_insert__tup (Array *, int, Tuple *);
+Tuple dampl_arr_insert__tup (Array, int, Tuple);
 
 /* Array set method
    Set a given position in an array to the value passed by the user */
 
-void dampl_arr_set__arr (Array *, int, Array);
+Array dampl_arr_set__arr (Array, int, Array);
 
-void dampl_arr_set__int (Array *, int, int); 
+int dampl_arr_set__int (Array, int, int); 
 
-void dampl_arr_set__float (Array *, int, float); 
+float dampl_arr_set__float (Array, int, float); 
 
-void dampl_arr_set__str (Array *, int, String); 
+String dampl_arr_set__str (Array, int, String); 
 
-//void dampl_arr_set__tup (Array *, Tuple *); 
+Tuple dampl_arr_set__tup (Array, Tuple); 
 
 /* Array get method 
    Returns an element in a given position */
@@ -78,7 +73,16 @@ float dampl_arr_get__float (Array, int);
 
 String dampl_arr_get__str (Array, int);
 
-//Tuple dampl_arr_get__tup (Array, int);
+Tuple dampl_arr_get__tup (Array, int);
+
+
+/* Extract attribute from table (array of tuples) */
+
+Array dampl_arr_extract_attr__int(Array, int);
+
+Array dampl_arr_extract_attr__float(Array, int);
+
+Array dampl_arr_extract_attr__str(Array, int);
 
 /* Array ensure capacity method */
 

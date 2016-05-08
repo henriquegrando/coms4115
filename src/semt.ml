@@ -12,8 +12,9 @@ type sem_obj = (* lhs *)
     SId of string
   | SBrac of (* a[0] a[i] a[i+1] *)
     sem_obj * sem_expr *
-    bool (* indicate if it is insertion *) 
-  | SBrac2 of sem_obj * sem_expr * sem_expr (* a[0:2] *)
+    bool * (* indicate if it is insertion *) 
+    typ
+  | SBrac2 of sem_obj * sem_expr * sem_expr * typ (* a[0:2] *)
   | SAttr of (* a$b *)
     typ * (* type of the object (tuple or table of something) *)
     typ * (* type of the attribute *)
@@ -37,11 +38,12 @@ and
   | SUnop of typ * uop * sem_expr
   | SAssign of typ * sem_obj * sem_expr
   | SCall of string * sem_expr list
-  | STupInst of string (* tuple instantiation *)
+  | STupInst of string * int (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
   | STupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
   | SArr of typ * sem_expr list (* arrays e.g. [1,2,3] *)
   | SNoexpr
+  | SString of string (* For use inside codegen only *)
  
 
 type sem_stmt =
@@ -49,7 +51,7 @@ type sem_stmt =
   | SExpr of sem_expr
   | SReturn of sem_expr
   | SIf of sem_expr * sem_stmt * sem_stmt
-  | SFor of string * sem_expr * sem_stmt (* for i in a *)
+  | SFor of string * typ * sem_expr * sem_stmt (* for i in a *)
   | SWhile of sem_expr * sem_stmt
   | SBreak
   | SContinue

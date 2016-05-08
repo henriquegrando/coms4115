@@ -119,7 +119,11 @@ and string_of_expr = function
       | SAttr(otyp,atyp,o2,name,inx) -> (match otyp with
           Tuple(tname) -> "dampl_tup_set__"^simple_string_of_typ t^"("
             ^string_of_obj o2^","^string_of_int inx^","^string_of_expr e^")"
-        | Table(tname) -> "dampl_arr_set_attr__"^simple_string_of_typ t^"("
+        | Table(tname) -> let attrtyp = (match atyp with
+              Array(t) -> t
+            | _ -> raise(Failure("attr of table failure"))
+          ) in
+          "dampl_arr_set_attr__"^simple_string_of_typ attrtyp^"("
           ^string_of_obj o2^","^string_of_int inx^","^string_of_expr e^")"
         | _ -> raise(Failure("$attribute failure"))
       )

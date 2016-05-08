@@ -20,6 +20,8 @@ let loop_stack = (Stack.create () : int Stack.t);;
 
 let tup_decls = ref StringMap.empty;;
 
+let tup_attrs = ref StringMap.empty;;
+
 let tup_inx = ref StringMap.empty;;
 
 let tup_sizes = ref StringMap.empty;;
@@ -42,11 +44,12 @@ let rec string_of_typ = function
   | Int -> "Int"
   | Float -> "Float"
   | Void -> "Void"
+  | String -> "String"
   | Array(x) -> "Array("^(string_of_typ x)^")"
   | Table(x) -> "Table("^x^")"
   | Tuple(x) -> "Tuple("^x^")"
   | Undefined -> "Undefined"
-  | _ -> "unknown";;
+  
 
 let get_built_in_name_folder map fun_prot =
   StringMap.add (get_built_in_name fun_prot) true map;;
@@ -98,7 +101,7 @@ let rec get_string_of_sem_obj semobj = match semobj with
     SId(id) -> id
   | SBrac(o,_,_,_) -> (get_string_of_sem_obj o)^"*"
   | SBrac2(o,_,_,_) -> (get_string_of_sem_obj o)
-  | SAttr(_,_,o,attr,_) -> (get_string_of_sem_obj o)^"$"
+  | SAttr(_,_,o,attr,_) -> (get_string_of_sem_obj o)^"$"^attr^"$"
   | SAttrInx(_,_,o,_) -> (get_string_of_sem_obj o)^"$$"
   (* | _ -> raise(Failure("get_string_of_sem_obj case not implemented")) *)
 
@@ -127,7 +130,6 @@ let rec get_obj_typ (o : sem_obj) : typ = match o with
       else get_id_typ_from_locals_or_globals id fname
   | SBrac(o,e,i,_) ->
       let otyp = get_obj_typ o in
-      
       ( match otyp with
         Table(t) -> Tuple(t)
       | Array(t) -> t
@@ -219,7 +221,7 @@ let rec check_if_exists_in_stack stack str =
     else check_if_exists_in_stack stack str;;
 
 let rec add_id_to_map_backtrace mapref semobj expr_typ =
-  print_string("backtrace adding "^(get_string_of_sem_obj semobj)^" "^(string_of_typ expr_typ)^"\n");
+  (* print_string("backtrace adding "^(get_string_of_sem_obj semobj)^" "^(string_of_typ expr_typ)^"\n"); *)
   mapref := StringMap.add (get_string_of_sem_obj semobj) expr_typ !mapref;
   ( match semobj with
       SBrac(o,_,_,_)  -> (add_id_to_map_backtrace mapref o (Array(expr_typ)))
@@ -228,18 +230,38 @@ let rec add_id_to_map_backtrace mapref semobj expr_typ =
   ()
 
 let rec add_id_to_map_helper mapref semobj expr_typ backtrace =
-  print_string("adding "^(get_string_of_sem_obj semobj)^" "^(string_of_typ expr_typ)^"\n");
+  (* print_string("adding "^(get_string_of_sem_obj semobj)^" "^(string_of_typ expr_typ)^"\n"); *)
   (if backtrace then ( match semobj with
       SBrac(o,_,_,_) -> (add_id_to_map_backtrace mapref o (Array(expr_typ)))
     | SBrac2(o,_,_,_) -> (add_id_to_map_backtrace mapref o (expr_typ))
     | _ -> ()
   ) else ());
   ( match expr_typ with
-      Table(x) -> (add_id_to_map_helper mapref (SBrac(semobj,SNoexpr,false,(Tuple(x))) ) (Tuple(x)) false); ()
+      Tuple(x) -> (
+        let register_attr attr =
+          ((mapref := StringMap.add
+            ((get_string_of_sem_obj semobj)^"$"^(snd attr)^"$" ) (fst attr)
+          !mapref);
+          (* print_string("adding-attr "^((get_string_of_sem_obj semobj)^"$"^(snd attr)^"$" )^" "^(string_of_typ (fst attr))^"\n"); *)
+          ())
+           in
+        List.iter register_attr (StringMap.find x !tup_attrs)
+      )
+    | Table(x) ->
+      (add_id_to_map_helper mapref (SBrac(semobj,SNoexpr,false,(Tuple(x))) ) (Tuple(x)) false);
+      (let register_attr attr =
+          ((mapref := StringMap.add
+            ((get_string_of_sem_obj semobj)^"$"^(snd attr)^"$" ) (Array(fst attr))
+          !mapref);
+          (* print_string("adding-attr "^((get_string_of_sem_obj semobj)^"$"^(snd attr)^"$" )^" "^(string_of_typ (Array(fst attr)))^"\n"); *)
+          ())
+           in
+        List.iter register_attr (StringMap.find x !tup_attrs));
+      ()
     | Array(x) -> (add_id_to_map_helper mapref (SBrac(semobj,SNoexpr,false,x)) x false); ()
     | _ -> ()
   );
-  mapref := StringMap.add (get_string_of_sem_obj semobj) expr_typ !mapref;
+  (mapref := StringMap.add (get_string_of_sem_obj semobj) expr_typ !mapref);
   (* (StringMap.iter pv !mapref); *)
   ()
 
@@ -304,8 +326,8 @@ and convert_obj_checking_side (o : obj) (is_lhs : bool ) : sem_obj = match o wit
       let seme = convert_expr e in
       let otyp = get_obj_typ semo in
       let etyp = get_expr_typ seme in
-      (print_string ((string_of_typ otyp)^" "));
-      (print_string ((get_string_of_sem_obj semo)^"\n"));
+      (* (print_string ((string_of_typ otyp)^" ")); *)
+      (* (print_string ((get_string_of_sem_obj semo)^"\n")); *)
       if etyp = Int || (seme = SNoexpr && is_lhs) then
         match otyp with
           Table(t) -> SBrac(semo,seme,i,Tuple(t))
@@ -343,7 +365,7 @@ and convert_obj_checking_side (o : obj) (is_lhs : bool ) : sem_obj = match o wit
             then StringMap.find (x^"$"^attr) !tup_decls
             else raise(Failure(x^"$"^attr^" doesnt exist")) in
           let inx = StringMap.find (x^"$"^attr) !tup_inx
-          in SAttr(Table(x),Array(t),semo,attr,inx)
+          in SAttr(Tuple(x),t,semo,attr,inx)
       | _ -> raise(Failure("cant get attr of item that is not tuple or table"))
     ) 
   | AttrInx(o,expr) ->
@@ -419,11 +441,11 @@ and convert_expr (exp : expr) : sem_expr = match exp with
         then SUnop(exprtyp,op,semexpr)
         else raise(Failure("minus unop on invalid type"))
   | Call(s,lst) -> ( (* (print_string("_"^s^"_in "^(Stack.top fun_parser_stack)^"\n"); *)
-          let exprs = convert_exprs lst in 
-          let typs = (List.map get_expr_typ exprs) in
-          (* veirifies if it is a special function *)
-          let sbexpr = handle_special_function s lst exprs in
+          (* verifies if it is a special function *)
+          let sbexpr = handle_special_function s lst in
           if sbexpr = SNoexpr then
+            let exprs = convert_exprs lst in 
+            let typs = (List.map get_expr_typ exprs) in
             let funname = (handle_scall s typs ) in
             SCall(funname,exprs) 
           else sbexpr )
@@ -448,7 +470,7 @@ and convert_expr (exp : expr) : sem_expr = match exp with
     | [] -> Undefined )
     in SArr(checktyps exptyps, semexps)    
   | Noexpr -> SNoexpr
-  | _ -> raise( Failure ("convert_expr case not implemented"))
+  
 
 and convert_exprs exps = (List.map convert_expr exps)
 
@@ -512,6 +534,8 @@ and convert_assign o e = (
     if StringMap.mem (get_string_of_sem_obj semobj) !globals
     (* outside function, global environment *)
     then (
+      (* print_string((get_string_of_sem_obj semobj)^" "^(string_of_param_typ(get_obj_typ semobj))); *)
+      (* print_string(" "^(string_of_param_typ(get_expr_typ semexpr))^"\n"); *)
       let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !globals in
       if expectedtyp = get_expr_typ semexpr
         || (expectedtyp = Float && (get_expr_typ semexpr) = Int)
@@ -527,7 +551,7 @@ and convert_assign o e = (
         then ( add_id_to_map globals semobj expr_typ;
         SAssign(expr_typ,semobj, semexpr) )
       else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
-    ) else ( add_id_to_map globals semobj expr_typ;
+    ) else ( add_id_to_map globals semobj expr_typ; 
     SAssign(expr_typ,semobj, semexpr)
     )
   ) else (
@@ -536,8 +560,6 @@ and convert_assign o e = (
     if StringMap.mem (get_string_of_sem_obj semobj) !(semfdecl.semlocals)
     (* check if it is a local variable *)
     then (
-      (* print_string((get_string_of_sem_obj semobj)^" "^(string_of_param_typ(get_obj_typ semobj)));
-      print_string(" "^(string_of_param_typ(get_expr_typ semexpr))^"\n"); *)
       let expectedtyp = StringMap.find (get_string_of_sem_obj semobj) !(semfdecl.semlocals) in
       if expectedtyp = get_expr_typ semexpr
         || (expectedtyp = Float && (get_expr_typ semexpr) = Int)
@@ -580,15 +602,14 @@ and convert_assign o e = (
   )
 )
 
-and handle_special_function (name : string) (exprs : expr list)
-              (sem_exprs : sem_expr list) : sem_expr =
+and handle_special_function (name : string) (exprs : expr list) : sem_expr =
   match name with
   (* len call for arrays or tables *)
   "len" -> ( match exprs with
     [Obj(o)] -> ( match (get_obj_typ (convert_obj_checking_side o true)) with
-          Table(_) -> SCall("fun_that_get_table_size",sem_exprs)
-        | Array(_) -> SCall("fun_that_get_array_size",sem_exprs)
-        | Tuple(name) -> (SLiteral(StringMap.find name !tup_inx))
+          Table(_) -> SCall("fun_that_get_table_size",(convert_exprs exprs))
+        | Array(_) -> SCall("fun_that_get_array_size",(convert_exprs exprs))
+        | Tuple(name) -> (SLiteral(StringMap.find name !tup_sizes))
         | _ -> SNoexpr
       )
     | _ -> SNoexpr
@@ -642,11 +663,14 @@ let rec remove_formals_from_locals formals map = match formals with
 let fun_map_to_list_fold_helper k v l =
   (* print_string ("function: "^(string_of_typ v.rtyp)^" "^v.semfname^"\n" ); *)
   v.semlocals := remove_formals_from_locals v.semformals !(v.semlocals);
-  v.semlocals := StringMap.filter (fun k -> (fun v -> (k.[(String.length k)-1] <> '*'))) !(v.semlocals);
+  v.semlocals := StringMap.filter
+    (fun k -> (fun v -> (k.[(String.length k)-1] <> '*' && k.[(String.length k)-1] <> '$')))
+    !(v.semlocals);
   if ( StringMap.mem v.originalname built_in_decls) then l else v::l;;
 
 let globals_map_to_list_fold_helper k v l = 
-  if k.[(String.length k)-1] = '*' then l else (v,k)::l
+  if (k.[(String.length k)-1] = '*' || k.[(String.length k)-1] = '$')
+    then l else (v,k)::l
 
 (*
 let reparse_fun2 name =
@@ -700,6 +724,7 @@ let create_tup_decl tdecl =
   in 
   (tup_sizes := StringMap.add (fst tdecl) tsize !tup_sizes);
   (tup_decls := StringMap.add (fst tdecl) (Tuple(fst tdecl)) !tup_decls);
+  (tup_attrs := StringMap.add (fst tdecl) (snd tdecl) !tup_attrs);
   List.iteri create_tup_item (snd tdecl) ;;
 
 let rec create_tups_from_decls decls = match decls with

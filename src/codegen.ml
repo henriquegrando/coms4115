@@ -28,15 +28,9 @@ let string_of_typ = function
   | String -> "String"
   | Array(_) -> "Array"
   | Table(_) -> "Array"
+  | Tuple(_) -> "Tuple"
   | Undefined -> raise(Failure("Undefined type on string_of_typ"))
-  (*
-  
-  
-  | Tuple of string
-  | Table of string
-  | Array of typ
- *)
-  | _ -> raise ( Failure( "string_of_typ case not implemented" ))
+
 
 let string_of_op = function
     Add -> "+"
@@ -69,11 +63,24 @@ let rec string_of_obj = function
       let e1 = if e1 = SNoexpr then empty_inx else e1 in
       let e2 = if e2 = SNoexpr then empty_inx else e2 in
       "dampl_arr_get_range__arr(" ^ string_of_obj o ^ ","
-      ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ")"
-  | _ -> raise ( Failure( "string_of_obj case not implemented" ))
- (* | SAttr(otyp,atyp,o,name,inx) -> (match otyp with
-        Tuple(tname) -> 
-    ) *)
+      ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ")" 
+  | SAttr(otyp,atyp,o,name,inx) -> (match otyp with
+        Tuple(tname) -> "dampl_tup_get__"^simple_string_of_typ atyp^"("
+          ^string_of_obj o^","^string_of_int inx^")"
+      | Table(tname) -> let typ = (match atyp with
+            Array(t) -> simple_string_of_typ t
+          | _ -> raise(Failure("attribute extraction failure"))
+        ) in "dampl_arr_extract_attr__"^typ^"("^string_of_obj o^","
+          ^string_of_int inx^")"
+      | _ -> raise(Failure("$attribute failure"))
+    )
+  | SAttrInx(otyp,atyp,o,inx_expr) -> (match otyp with
+        Tuple(tname) -> "dampl_tup_get__str("
+          ^string_of_obj o^","^string_of_expr inx_expr^")"
+      | Table(tname) -> "dampl_arr_extract_attr__str("^string_of_obj o^","
+          ^string_of_expr inx_expr^")"
+      | _ -> raise(Failure("$attribute failure"))
+    )
   (*
   | SBrac of string * sem_expr (* a[0] a[i] a[i+1] *)
   | SBrac2 of string * sem_expr * sem_expr (* a[0:2] *)
@@ -104,6 +111,20 @@ and string_of_expr = function
         let e22 = if e22 = SNoexpr then empty_inx else e22 in
         "dampl_arr_set_range__arr(" ^ string_of_obj o2 ^ ","
         ^ string_of_expr e21 ^ "," ^ string_of_expr e22 ^ "," ^ string_of_expr e ^ ")"
+      | SAttr(otyp,atyp,o2,name,inx) -> (match otyp with
+          Tuple(tname) -> "dampl_tup_set__"^simple_string_of_typ t^"("
+            ^string_of_obj o2^","^string_of_int inx^","^string_of_expr e^")"
+        | Table(tname) -> "dampl_arr_set_attr__"^simple_string_of_typ t^"("
+          ^string_of_obj o2^","^string_of_int inx^","^string_of_expr e^")"
+        | _ -> raise(Failure("$attribute failure"))
+      )
+      | SAttrInx(otyp,atyp,o2,inx_expr) -> (match otyp with
+          Tuple(tname) -> "dampl_tup_set__"^simple_string_of_typ t^"("
+            ^string_of_obj o2^","^string_of_expr inx_expr^","^string_of_expr e^")"
+        | Table(tname) -> "dampl_arr_set_attr__"^simple_string_of_typ t^"("
+          ^string_of_obj o^","^string_of_expr inx_expr^","^string_of_expr e^")"
+        | _ -> raise(Failure("$attribute failure"))
+      )
       | _ -> string_of_obj o ^ " = " ^ string_of_expr e
   )
   | SCall(f, el) ->
@@ -117,6 +138,8 @@ and string_of_expr = function
           ^(String.concat "" (List.map create_append exprs))
           ^"a;})"
       )
+  | STabInst(_) -> "dampl_arr_new()"
+  | STupInst(name,n) -> "dampl_tup_new("^string_of_int n^")"
   (*
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
@@ -126,7 +149,6 @@ and string_of_expr = function
   *)
   | SNoexpr -> ""
   | SString(s) -> s
-  | _ -> raise ( Failure( "string_of_expr case not implemented" ))
 
 
 let rec string_of_stmt = function
@@ -144,7 +166,7 @@ let rec string_of_stmt = function
       ^ "for (;"
         ^"i_"^str^" < dampl_arr_size(" ^ string_of_expr e ^ ");"
         ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(++i_"^str ^ ")"
-      ^")\n"^string_of_stmt s
+      ^")\n"^string_of_stmt s^"}\n"
   
      (* "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s

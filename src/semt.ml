@@ -40,7 +40,6 @@ and
   | SCall of string * sem_expr list
   | STupInst of string * int (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
-  | STupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
   | SArr of typ * sem_expr list (* arrays e.g. [1,2,3] *)
   | SNoexpr
   | SString of string (* For use inside codegen only *)

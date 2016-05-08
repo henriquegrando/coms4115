@@ -84,6 +84,16 @@ Array dampl_arr_extract_attr__float(Array, int);
 
 Array dampl_arr_extract_attr__str(Array, int);
 
+/* Set attribute of table (array of tuples)
+	Checks if array containing values are of
+			same size as table */
+
+Array dampl_arr_set_attr__int(Array, int, Array);
+
+Array dampl_arr_set_attr__float(Array, int, Array);
+
+Array dampl_arr_set_attr__str(Array, int, Array);
+
 /* Array ensure capacity method */
 
 void dampl_arr_ensure_cap__arr (Array *, int);

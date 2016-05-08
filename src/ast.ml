@@ -33,7 +33,6 @@ and
   | Call of string * expr list
   | TupInst of string (* tuple instantiation *)
   | TabInst of string (* table instantiation e.g. Foo[] *)
-  | TupInit of string * expr list (* tuple init e.g. Foo{1,2,"abc"} *)
   | Arr of expr list (* arrays e.g. [1,2,3] *)
   | Noexpr
 

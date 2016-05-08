@@ -1,14 +1,8 @@
-tuple Tup{aa,bb:real,cc}
+a=[2];
 
-a=[[1],[2]];
-
-tab=Tup[];
-
-fun bar(t) {
-	print(len(t[]));
+for i in a {
+	
 }
-
-bar(tab);
 
 
 /*

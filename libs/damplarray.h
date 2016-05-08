@@ -9,6 +9,7 @@ typedef struct
 {
     void * a;
     int size;
+    int capacity;
     void (*add) (Array *, void *);
     void (*insert) (Array *, int, void *);
     void (*set) (Array *, int, void *);
@@ -27,15 +28,15 @@ int dampl_arr_len(Array);
 /* Array add method 
    Appends an element in the end of the array */
 
-void dampl_arr_add__arr (Array, Array);
+void dampl_arr_append__arr (Array, Array);
 
-int dampl_arr_add__int (Array, int);
+int dampl_arr_append__int (Array, int);
 
-float dampl_arr_add__float (Array, float);
+float dampl_arr_append__float (Array, float);
 
-String dampl_arr_add__str (Array, String);
+String dampl_arr_append__str (Array, String);
 
-Tuple dampl_arr_add__tup (Array, Tuple);
+Tuple dampl_arr_append__tup (Array, Tuple);
 
 
 /* Array insertion method 

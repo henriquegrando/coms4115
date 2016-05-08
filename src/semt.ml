@@ -10,10 +10,22 @@ type sem_tup = string * typed_id list (* tuple creation *)
 
 type sem_obj = (* lhs *)
     SId of string
-  | SBrac of sem_obj * sem_expr * bool (* a[0] a[i] a[i+1] *)
+  | SBrac of (* a[0] a[i] a[i+1] *)
+    sem_obj * sem_expr *
+    bool (* indicate if it is insertion *) 
   | SBrac2 of sem_obj * sem_expr * sem_expr (* a[0:2] *)
-  | SAttr of typ * sem_obj * string (* a$b *)
-  | SAttrInx of typ * sem_obj * sem_expr (* TREAT AS STRING *)
+  | SAttr of (* a$b *)
+    typ * (* type of the object (tuple or table of something) *)
+    typ * (* type of the attribute *)
+    sem_obj *
+    string * (* name of the attribute *)
+    int (* index of the attribute*)
+  (* e.g. in a$b 1st typ is typ of a and 2nd is typ of attr b*)
+  | SAttrInx of (* a$(int_expr) - TREAT AS STRING *)
+    typ * (* type of the object (tuple or table of something) *)
+    typ * (* type of the attribute (String or Array(String) ) *)
+    sem_obj *
+    sem_expr (* index expression *)
 and
  sem_expr =
     SLiteral of int
@@ -25,7 +37,6 @@ and
   | SUnop of typ * uop * sem_expr
   | SAssign of typ * sem_obj * sem_expr
   | SCall of string * sem_expr list
-  (* TODO: add typ below *)
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
   | STupInit of string * sem_expr list (* tuple init e.g. Foo{1,2,"abc"} *)
@@ -63,69 +74,3 @@ type sem_program =
   sem_stmt list *
   sem_func_decl list * 
   sem_tup list
-
-(* Pretty-printing functions *)
-(*
-let string_of_op = function
-    Add -> "+"
-  | Sub -> "-"
-  | Mult -> "*"
-  | Div -> "/"
-  | Equal -> "=="
-  | Neq -> "!="
-  | Less -> "<"
-  | Leq -> "<="
-  | Greater -> ">"
-  | Geq -> ">="
-  | And -> "&&"
-  | Or -> "||"
-
-let string_of_uop = function
-    Neg -> "-"
-  | Not -> "!"
-
-let rec string_of_expr = function
-    Literal(l) -> string_of_int l
-  | BoolLit(true) -> "true"
-  | BoolLit(false) -> "false"
-  | Id(s) -> s
-  | Binop(e1, o, e2) ->
-      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
-  | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | Noexpr -> ""
-
-let rec string_of_stmt = function
-    Block(stmts) ->
-      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-  | Expr(expr) -> string_of_expr expr ^ ";\n";
-  | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n";
-  | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
-  | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
-      string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
-  | For(e1, e2, e3, s) ->
-      "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
-      string_of_expr e3  ^ ") " ^ string_of_stmt s
-  | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
-
-let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Void -> "void"
-
-let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
-
-let string_of_fdecl fdecl =
-  string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n"
-
-let string_of_program (vars, funcs) =
-  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
-*)

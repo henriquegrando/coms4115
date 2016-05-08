@@ -12,6 +12,19 @@ let built_in_prototypes = [
     [Int];
     [Float];
   ]);
+  (Float,"float",[
+    [String];
+    [Int];
+    [Float];
+  ]);
+  (Int,"int",[
+    [String];
+    [Int];
+    [Float];
+  ]);
+  (Int,"len",[
+    [String];
+  ]);
   (Void,"die",[[]]);
 ];;
 

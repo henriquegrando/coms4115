@@ -120,6 +120,11 @@ let is_array (typ : typ) : bool =
     Array(_) -> true
   | _ -> false
 
+let rec is_array_of_undefined typ = match typ with
+    Array(t) -> is_array_of_undefined t
+  | Undefined -> true
+  | _ -> false
+
 let rec get_obj_typ (o : sem_obj) : typ = match o with
     SId(id) -> (* print_string(id); print_string(Stack.top fun_parser_stack); *)
       let fname = (Stack.top fun_parser_stack) in
@@ -503,10 +508,12 @@ and convert_stmt stmt = match stmt with
       let typ = get_expr_typ semexpr in
       let value = match typ with
           Array(t) -> (
-            let mapref = if (Stack.top fun_parser_stack) = "_global_"
-            then globals else (StringMap.find (Stack.top fun_parser_stack) !parsed_funs).semlocals in
-            let return = (mapref := (StringMap.add id t !mapref)); SFor(id,t,semexpr, convert_stmt stmt) in
-            (mapref := (StringMap.remove id !mapref)); return )
+            if t = Undefined then raise(Failure("cant loop on array of undefined type"))
+            else  
+              let mapref = if (Stack.top fun_parser_stack) = "_global_"
+              then globals else (StringMap.find (Stack.top fun_parser_stack) !parsed_funs).semlocals in
+              let return = (mapref := (StringMap.add id t !mapref)); SFor(id,t,semexpr, convert_stmt stmt) in
+              (mapref := (StringMap.remove id !mapref)); return )
         | Table(t) -> (
             let mapref = if (Stack.top fun_parser_stack) = "_global_"
             then globals else (StringMap.find (Stack.top fun_parser_stack) !parsed_funs).semlocals in

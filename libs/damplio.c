@@ -18,6 +18,70 @@ void dampl_print__int (int i)
     printf("%d", i);
 }
 
+
+void dampl_arr_print__arr (Array arr){
+    int i, size;
+
+    size = dampl_arr_len(arr);
+
+    for(i = 0; i < size; i++){
+        dampl_arr_print__arr (dampl_arr_get__arr (arr, i));
+    }
+}
+
+void dampl_arr_print__int (Array arr){
+    int i, size;
+
+    size = dampl_arr_len(arr);
+
+    for(i = 0; i < size; i++){
+        dampl_print__int (dampl_arr_get__int (arr, i));
+    }
+}
+
+void dampl_arr_print__float (Array arr){
+    int i, size;
+
+    size = dampl_arr_len(arr);
+
+    for(i = 0; i < size; i++){
+        dampl_print__float (dampl_arr_get__float (arr, i));
+    }
+}
+
+void dampl_arr_print__str (Array arr){
+    int i, size;
+
+    size = dampl_arr_len(arr);
+
+    for(i = 0; i < size; i++){
+        dampl_print__str (dampl_arr_get__str (arr, i));
+    }
+}
+
+void dampl_arr_print__tup (Array arr){
+    int i, size;
+
+    size = dampl_arr_len(arr);
+
+    for(i = 0; i < size; i++){
+        dampl_print__tup (dampl_arr_get__tup (arr, i));
+    }
+}
+
+
+void dampl_print__tup (Tuple tup){
+	int i;
+
+	size = dampl_tup_len(tup);
+
+    for(i = 0; i < size; i++){
+        dampl_print__str (dampl_tup_get__str (tup, i));
+    }
+}
+
+
+
 Array dampl_strsplit__str (String str, String separator){
 	Array arr = dampl_arr_new();
 

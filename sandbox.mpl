@@ -1,8 +1,8 @@
-a=[2];
-
-for i in a {
 	
-}
+a="Hello";
+b="World";
+c=a+b;
+print(c);
 
 
 /*

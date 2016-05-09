@@ -5,7 +5,9 @@ let built_in_prototypes = [
   (Void,"print",[
     [String];
     [Int];
-    [Float]
+    [Float];
+    [Array];
+    [Tuple];
   ]);
   (String,"str",[
     [String];

@@ -109,9 +109,15 @@ void dampl_print__tup (Tuple tup){
 
 	size = dampl_tup_len(tup);
 
-    for(i = 0; i < size; i++){
-        dampl_print__str (dampl_tup_get__str (tup, i));
-    }
+  printf("(");
+  dampl_print__str (dampl_tup_get__str (tup, 0));
+  
+  for(i = 1; i < size; i++){
+    printf(", ");
+    dampl_print__str (dampl_tup_get__str (tup, i));
+  }
+
+  printf(")");
 }
 
 

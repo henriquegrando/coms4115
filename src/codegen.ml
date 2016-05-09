@@ -96,7 +96,7 @@ and string_of_expr = function
   | SObj(o) -> string_of_obj o
   | SBinop(t, e1, o, e2) -> ( match t with
         String -> (match o with
-            Add -> "( dampl_str_concat("^ string_of_expr e1 ^ "," ^ string_of_expr e1 ^ ") )"
+            Add -> "( dampl_str_concat("^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ") )"
           | Equal | Neq | Less | Leq | Greater | Geq ->
               "( strcmp("^ string_of_expr e1 ^ "," ^ string_of_expr e1 ^ ") "^string_of_op o^" 0 )"
           | _ -> raise(Failure("String operation translation failure"))

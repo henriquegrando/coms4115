@@ -1,6 +1,7 @@
 #include "damplio.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void dampl_print__str (String string)
 {
@@ -18,7 +19,22 @@ void dampl_print__int (int i)
 }
 
 Array dampl_strsplit__str (String str){
+	Array arr = dampl_arr_new();
 
+	const char s[2] = "\n";
+	char *token;
+
+	/* get the first token */
+	token = strtok(str, s);
+	dampl_arr_append__str (arr, token);
+
+	/* walk through other tokens */
+	while( token != NULL ) {
+		token = strtok(NULL, s);
+		dampl_arr_append__str (arr, token);
+	}
+
+	return arr;
 }
 
 String dampl_readfile__str (String file_name){
@@ -61,5 +77,6 @@ String dampl_readfile__str (String file_name){
 }
 
 void dampl_writefile__str_str (String string1, String string2){
+
 
 }

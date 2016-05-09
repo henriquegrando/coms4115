@@ -19,54 +19,88 @@ void dampl_print__int (int i)
 }
 
 
-void dampl_arr_print__arr (Array arr){
+void dampl_arr_print__int (Array arr, int dimensions){
     int i, size;
 
     size = dampl_arr_len(arr);
 
-    for(i = 0; i < size; i++){
-        dampl_arr_print__arr (dampl_arr_get__arr (arr, i));
-    }
-}
+    printf("[ ");
 
-void dampl_arr_print__int (Array arr){
-    int i, size;
-
-    size = dampl_arr_len(arr);
-
-    for(i = 0; i < size; i++){
+    if(dimensions == 1){
+      for(i = 0; i < size; i++){
         dampl_print__int (dampl_arr_get__int (arr, i));
+      }
     }
+    else{
+      for(i = 0; i < size; i++){
+        dampl_arr_print__int (dampl_arr_get__arr (arr, i), dimensions-1);
+      }
+    }
+
+    printf(" ]");
 }
 
-void dampl_arr_print__float (Array arr){
+void dampl_arr_print__float (Array arr, int dimensions){
     int i, size;
 
     size = dampl_arr_len(arr);
 
-    for(i = 0; i < size; i++){
+    printf("[ ");
+
+    if(dimensions == 1){
+      for(i = 0; i < size; i++){
         dampl_print__float (dampl_arr_get__float (arr, i));
+      }
     }
+    else{
+      for(i = 0; i < size; i++){
+        dampl_arr_print__float (dampl_arr_get__arr (arr, i), dimensions-1);
+      }
+    }
+
+    printf(" ]");
 }
 
-void dampl_arr_print__str (Array arr){
+void dampl_arr_print__str (Array arr, int dimensions){
     int i, size;
 
     size = dampl_arr_len(arr);
 
-    for(i = 0; i < size; i++){
-        dampl_print__str (dampl_arr_get__str (arr, i));
+    printf("[ ");
+
+    if(dimensions == 1){
+      for(i = 0; i < size; i++){
+        dampl_print__str (dampl_arr_get__str(arr, i));
+      }
     }
+    else{
+      for(i = 0; i < size; i++){
+        dampl_arr_print__str (dampl_arr_get__arr(arr, i), dimensions-1);
+      }
+    }
+
+    printf(" ]");
 }
 
-void dampl_arr_print__tup (Array arr){
+void dampl_arr_print__tup (Array arr, int dimensions){
     int i, size;
 
     size = dampl_arr_len(arr);
 
-    for(i = 0; i < size; i++){
-        dampl_print__tup (dampl_arr_get__tup (arr, i));
+    printf("[ ");
+
+    if(dimensions == 1){
+      for(i = 0; i < size; i++){
+        dampl_print__tup (dampl_arr_get__tup(arr, i));
+      }
     }
+    else{
+      for(i = 0; i < size; i++){
+        dampl_arr_print__tup (dampl_arr_get__arr (arr, i), dimensions-1);
+      }
+    }
+
+    printf(" ]");
 }
 
 

@@ -3,6 +3,8 @@
 
 #include "damplio.h"
 #include "damplstr.h"
+#include "damplarray.h"
+#include "dampltup.h"
 
 
 String dampl_str__str (String string);

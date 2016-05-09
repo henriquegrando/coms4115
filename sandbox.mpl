@@ -1,6 +1,11 @@
+a=[2];
 
-tuple Tup{aa,bb:real,cc}
+for i in a {
+	
+}
 
+
+/*
 fun foo() {
 	a=[[1,2],[3,4]];
 	for i in a {
@@ -20,5 +25,5 @@ fun bar(table) {
 a=Tup[];
 bar(a);
 
-
+*/
 

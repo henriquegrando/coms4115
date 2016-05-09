@@ -106,4 +106,18 @@ void dampl_arr_ensure_cap__str (Array, int);
 
 void dampl_arr_ensure_cap__tup (Array, int);
 
+
+/* Concatenates arrays */
+
+Array dampl_arr_concat__arr (Array, Array);
+
+Array dampl_arr_concat__int (Array, Array);
+
+Array dampl_arr_concat__float (Array, Array);
+
+Array dampl_arr_concat__str (Array, Array);
+
+Array dampl_arr_concat__tup (Array, Array);
+
+
 #endif

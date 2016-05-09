@@ -304,6 +304,114 @@ Tuple dampl_arr_get__tup (Array this, int index)
     return ((Tuple *) this->a)[index];
 }
 
+
+
+/* Extract attribute from table (array of tuples) */
+
+Array dampl_arr_extract_attr__int(Array table, int column){
+    int i, data;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+    arr->a = malloc(table->size*(sizeof(int)));
+    arr->size = 0;
+    arr->capacity = table->size;
+
+    for(i = 0; i < table->size; i++){
+        data = dampl_tup_get__int(dampl_arr_get__tup(table,i), column);
+        dampl_arr_append__int(arr, data);
+    }
+
+    return arr;
+}
+
+
+Array dampl_arr_extract_attr__float(Array table, int column){
+    int i;
+    float data;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+    arr->a = malloc(table->size*(sizeof(float)));
+    arr->size = 0;
+    arr->capacity = table->size;
+
+    for(i = 0; i < table->size; i++){
+        data = dampl_tup_get__float(dampl_arr_get__tup(table,i), column);
+        dampl_arr_append__float(arr, data);
+    }
+
+    return arr;
+}
+
+Array dampl_arr_extract_attr__str(Array table, int column){
+    int i;
+    String data;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+    arr->a = malloc(table->size*(sizeof(String)));
+    arr->size = 0;
+    arr->capacity = table->size;
+
+    for(i = 0; i < table->size; i++){
+        data = dampl_tup_get__str(dampl_arr_get__tup(table,i), column);
+        dampl_arr_append__str(arr, data);
+    }
+
+    return arr;
+}
+
+
+/* Set attribute of table (array of tuples)
+    Checks if array containing values are of
+            same size as table */
+
+Array dampl_arr_set_attr__int(Array table, int column, Array arr){
+    int i;
+
+    if(table->size != arr->size){
+        fprintf(stderr, "Arrays with different sizes\n");
+        exit(1);
+    }
+
+    for(i = 0; i < table->size; i++){
+        dampl_tup_set__int(dampl_arr_get__tup(table,i), column, dampl_arr_get__int(arr,i));
+    }
+
+    return table;
+}
+
+
+Array dampl_arr_set_attr__float(Array table, int column, Array arr){
+    int i;
+
+    if(table->size != arr->size){
+        fprintf(stderr, "Arrays with different sizes\n");
+        exit(1);
+    }
+
+    for(i = 0; i < table->size; i++){
+        dampl_tup_set__float(dampl_arr_get__tup(table,i), column, dampl_arr_get__float(arr,i));
+    }
+
+    return table;
+}
+
+
+Array dampl_arr_set_attr__str(Array table, int column, Array arr){
+    int i;
+
+    if(table->size != arr->size){
+        fprintf(stderr, "Arrays with different sizes\n");
+        exit(1);
+    }
+
+    for(i = 0; i < table->size; i++){
+        dampl_tup_set__str(dampl_arr_get__tup(table,i), column, dampl_arr_get__str(arr,i));
+    }
+
+    return table;
+}
+
+
 /* Ensure capacity */
 
 void dampl_arr_ensure_cap__arr (Array this, int sz)
@@ -432,3 +540,107 @@ void dampl_arr_ensure_cap__tup (Array this, int sz)
 }
 
 
+/* Concatenates arrays */
+
+Array dampl_arr_concat__arr (Array arr1, Array arr2){
+    int i;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+
+    arr->size = arr1->size + arr2->size;
+    arr->capacity = arr1->capacity + arr2->capacity;
+    arr->a = malloc(arr->capacity*sizeof(Array));
+
+    for(i = 0; i < arr1->size; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (arr1, i));
+    }
+
+    for(i = 0; i < arr2->size; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (arr2, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_concat__int (Array arr1, Array arr2){
+    int i;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+
+    arr->size = arr1->size + arr2->size;
+    arr->capacity = arr1->capacity + arr2->capacity;
+    arr->a = malloc(arr->capacity*sizeof(int));
+
+    for(i = 0; i < arr1->size; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (arr1, i));
+    }
+
+    for(i = 0; i < arr2->size; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (arr2, i));
+    }
+
+
+    return arr;
+}
+
+
+Array dampl_arr_concat__float (Array arr1, Array arr2){
+    int i;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+
+    arr->size = arr1->size + arr2->size;
+    arr->capacity = arr1->capacity + arr2->capacity;
+    arr->a = malloc(arr->capacity*sizeof(float));
+
+   for(i = 0; i < arr1->size; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (arr1, i));
+    }
+
+    for(i = 0; i < arr2->size; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (arr2, i));
+    }
+
+
+    return arr;
+}
+
+Array dampl_arr_concat__str (Array arr1, Array arr2){
+    int i;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+
+    arr->size = arr1->size + arr2->size;
+    arr->capacity = arr1->capacity + arr2->capacity;
+    arr->a = malloc(arr->capacity*sizeof(String));
+
+    for(i = 0; i < arr1->size; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (arr1, i));
+    }
+
+    for(i = 0; i < arr2->size; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (arr2, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_concat__tup (Array arr1, Array arr2){
+    int i;
+
+    Array arr = (Array) malloc (sizeof(Array*));
+
+    arr->size = arr1->size + arr2->size;
+    arr->capacity = arr1->capacity + arr2->capacity;
+    arr->a = malloc(arr->capacity*sizeof(Tuple));
+
+    for(i = 0; i < arr1->size; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (arr1, i));
+    }
+
+    for(i = 0; i < arr2->size; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (arr2, i));
+    }
+
+    return arr;
+}

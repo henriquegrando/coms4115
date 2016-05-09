@@ -18,14 +18,13 @@ void dampl_print__int (int i)
     printf("%d", i);
 }
 
-Array dampl_strsplit__str (String str){
+Array dampl_strsplit__str (String str, String separator){
 	Array arr = dampl_arr_new();
 
-	const char s[2] = "\n";
 	char *token;
 
 	/* get the first token */
-	token = strtok(str, s);
+	token = strtok(str, separator);
 	dampl_arr_append__str (arr, token);
 
 	/* walk through other tokens */

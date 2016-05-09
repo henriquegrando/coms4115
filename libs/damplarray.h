@@ -1,7 +1,9 @@
 #ifndef _DAMPL_ARRAY_
 #define _DAMPL_ARRAY_
 
-#define INITIAL_SIZE 5
+#include "damplstr.h"
+#include "dampltup.h"
+#include <stdlib.h>
 
 /* Array structure */
 
@@ -10,20 +12,15 @@ typedef struct
     void * a;
     int size;
     int capacity;
-    void (*add) (Array *, void *);
-    void (*insert) (Array *, int, void *);
-    void (*set) (Array *, int, void *);
-    void * (*get) (Array, int);
 } * Array;
 
 /* Array constructor for every type */
 
 Array dampl_arr_new();
 
+/* Length function */
+
 int dampl_arr_len(Array);
-
-
-//Array dampl_arr_new__tup ();
 
 /* Array add method 
    Appends an element in the end of the array */
@@ -99,14 +96,14 @@ Array dampl_arr_set_attr__str(Array, int, Array);
 
 /* Array ensure capacity method */
 
-void dampl_arr_ensure_cap__arr (Array *, int);
+void dampl_arr_ensure_cap__arr (Array, int);
 
-void dampl_arr_ensure_cap__int (Array *, int);
+void dampl_arr_ensure_cap__int (Array, int);
 
-void dampl_arr_ensure_cap__float (Array *, int);
+void dampl_arr_ensure_cap__float (Array, int);
 
-void dampl_arr_ensure_cap__str (Array *, int);
+void dampl_arr_ensure_cap__str (Array, int);
 
-//void dampl_arr_ensure_cap__tup (Array *, int);
+void dampl_arr_ensure_cap__tup (Array, int);
 
 #endif

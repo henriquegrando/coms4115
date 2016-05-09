@@ -1,64 +1,187 @@
-#include "dampllib.h"
+#include "damplarray.h"
 #include <stdio.h>
 
-/* Array constructor for every type */
+/* Constructor */
 
-Array dampl_arr_new__arr ()
+Array dampl_arr_new()
 {
-    Array arr;
-
-    arr.a = (Array *) calloc(INITIAL_SIZE, sizeof(Array));
-    arr.size = INITIAL_SIZE;
-    arr.add = &dampl_arr_add__arr;
-    arr.insert = &dampl_arr_insert__arr;
-    arr.set = &dampl_arr_set__arr;
-    arr.get = &dampl_arr_get__arr;
+    Array arr = (Array) malloc (sizeof(Array*));
+    arr->a = NULL;
+    arr->size = 0;
+    arr->capacity = 0;
 
     return arr;
 }
 
-Array dampl_arr_new__int ()
+/* Length */
+
+int dampl_arr_len(Array arr)
 {
-    Array arr;
+    return arr->size;
+}
 
-    arr.a = (int *) calloc(INITIAL_SIZE, sizeof(int));
-    arr.size = INITIAL_SIZE;
-    arr.add = &dampl_arr_add__int;
-    arr.insert = &dampl_arr_insert__int;
-    arr.set = &dampl_arr_set__int;
-    arr.get = &dampl_arr_get__int;
+/* Append */
 
-    return arr;
+void dampl_arr_append__arr (Array this, Array value)
+{
+    dampl_arr_ensure_cap__arr (this, this->size + 1);
 
+    ((Array *) this->a)[this->size++] = value;
+}
+
+int dampl_arr_append__int (Array this, int value)
+{
+    dampl_arr_ensure_cap__int (this, this->size + 1);
+
+    return ((int *) this->a)[this->size++] = value;
+}
+
+float dampl_arr_append__float (Array this, float value)
+{
+    dampl_arr_ensure_cap__float (this, this->size + 1);
+
+    return ((float *) this->a)[this->size++] = value;
+}
+
+String dampl_arr_append__str (Array this, String value)
+{
+    dampl_arr_ensure_cap__str (this, this->size + 1);
+
+    return ((String *) this->a)[this->size++] = value;
+}
+
+Tuple dampl_arr_append__tup (Array this, Tuple value)
+{
+    dampl_arr_ensure_cap__tup (this, this->size + 1);
+
+    return ((Tuple *) this->a)[this->size++] = value;
+}
+
+/* Ensure capacity */
+
+void dampl_arr_ensure_cap__arr (Array this, int sz)
+{
+    if (this->capacity < sz)
+    {
+        this->capacity = sz * 2;
+
+        /* Create new array */
+
+        Array *arr = (Array *) malloc (this->capacity * sizeof(Array));
+
+        /* Copy all elements to new array */
+
+        int i;
+
+        for (i = 0; i < this->size; i++)
+        {
+            arr[i] = ((Array *) this->a)[i];
+        }
+
+        free(this->a);
+
+        this->a = arr;
+    }
+}
+
+void dampl_arr_ensure_cap__int (Array this, int sz)
+{
+    if (this->capacity < sz)
+    {
+        this->capacity = sz * 2;
+
+        /* Create new array */
+
+        int *arr = (int *) malloc (this->capacity * sizeof(int));
+
+        /* Copy all elements to new array */
+
+        int i;
+
+        for (i = 0; i < this->size; i++)
+        {
+            arr[i] = ((int *) this->a)[i];
+        }
+
+        free(this->a);
+
+        this->a = arr;
+    }
+}
+
+void dampl_arr_ensure_cap__float (Array this, int sz)
+{
+    if (this->capacity < sz)
+    {
+        this->capacity = sz * 2;
+
+        /* Create new array */
+
+        float *arr = (float *) malloc (this->capacity * sizeof(float));
+
+        /* Copy all elements to new array */
+
+        int i;
+
+        for (i = 0; i < this->size; i++)
+        {
+            arr[i] = ((float *) this->a)[i];
+        }
+
+        free(this->a);
+
+        this->a = arr;
+    }
+}
+
+void dampl_arr_ensure_cap__str (Array this, int sz)
+{
+    if (this->capacity < sz)
+    {
+        this->capacity = sz * 2;
+
+        /* Create new array */
+
+        String *arr = (String *) malloc (this->capacity * sizeof(String));
+
+        /* Copy all elements to new array */
+
+        int i;
+
+        for (i = 0; i < this->size; i++)
+        {
+            arr[i] = ((String *) this->a)[i];
+        }
+
+        free(this->a);
+
+        this->a = arr;
+    }
+}
+
+void dampl_arr_ensure_cap__tup (Array this, int sz)
+{
+    if (this->capacity < sz)
+    {
+        this->capacity = sz * 2;
+
+        /* Create new array */
+
+        Tuple *arr = (Tuple *) malloc (this->capacity * sizeof(Tuple));
+
+        /* Copy all elements to new array */
+
+        int i;
+
+        for (i = 0; i < this->size; i++)
+        {
+            arr[i] = ((Tuple *) this->a)[i];
+        }
+
+        free(this->a);
+
+        this->a = arr;
+    } 
 }
 
 
-Array dampl_arr_new__float ()
-{
-    Array arr;
-
-    arr.a = (float *) calloc(INITIAL_SIZE, sizeof(float));
-    arr.size = INITIAL_SIZE;
-    arr.add = &dampl_arr_add__float;
-    arr.insert = &dampl_arr_insert__float;
-    arr.set = &dampl_arr_set__float;
-    arr.get = &dampl_arr_get__float;
-
-    return arr;
-}
-
-Array dampl_arr_new__str ()
-{
-    Array arr;
-
-    arr.a = (String *) calloc(INITIAL_SIZE, sizeof(String));
-    arr.size = INITIAL_SIZE;
-    arr.add = &dampl_arr_add__str;
-    arr.insert = &dampl_arr_insert__str;
-    arr.set = &dampl_arr_set__str;
-    arr.get = &dampl_arr_get__str;
-
-    return arr;
-}
-
-//Array dampl_arr_new__tup ();

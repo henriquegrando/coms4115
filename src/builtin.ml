@@ -32,6 +32,10 @@ let built_in_prototypes = [
   (Array(String),"strsplit",[
     [String]
   ]);
+  (Void,"writefile",[
+    [String];
+    [String];
+  ]);
 ];;
 
 let get_built_in_rtyp = function

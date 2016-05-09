@@ -1,5 +1,7 @@
 #include "damplarray.h"
 #include <stdio.h>
+#include <limits.h>
+
 
 /* Constructor */
 
@@ -640,6 +642,370 @@ Array dampl_arr_concat__tup (Array arr1, Array arr2){
 
     for(i = 0; i < arr2->size; i++){
         dampl_arr_append__tup (arr, dampl_arr_get__tup (arr2, i));
+    }
+
+    return arr;
+}
+
+
+
+/* Set Range Functions */
+
+int get_begin(int index1,int size){
+    int begin;
+
+    if(index1 == INT_MIN){
+        begin = 0;
+    }
+    else if(index1 >= size){
+        begin = size;
+    }
+    else if (index1 < 0){
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+    else{
+        begin = index1;
+    }
+
+    return begin;
+}
+
+int get_end(int index2, int size){
+    int end;
+
+    if((index2 >= size) || (index2 == INT_MIN)){
+        end = size;
+    }
+    else if (index2 < 0){
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+    else{
+        end = index2;
+    }
+
+    return end;
+}
+
+Array dampl_arr_set_range__arr (Array this, Array other, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Array)));
+    /**************************************/
+
+    for(i = 0; i < begin; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (this, i));
+    }
+
+    for(i = 0; i < other->size; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (other, i));
+    }
+
+    for(i = end; i < this->size; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_set_range__int (Array this, Array other, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(int)));
+    /**************************************/
+
+    for(i = 0; i < begin; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (this, i));
+    }
+
+    for(i = 0; i < other->size; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (other, i));
+    }
+
+    for(i = end; i < this->size; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_set_range__float (Array this, Array other, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Float)));
+    /**************************************/
+
+    for(i = 0; i < begin; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (this, i));
+    }
+
+    for(i = 0; i < other->size; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (other, i));
+    }
+
+    for(i = end; i < this->size; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_set_range__str (Array this, Array other, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(String)));
+    /**************************************/
+
+    for(i = 0; i < begin; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (this, i));
+    }
+
+    for(i = 0; i < other->size; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (other, i));
+    }
+
+    for(i = end; i < this->size; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_set_range__tup (Array this, Array other, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Tuple)));
+    /**************************************/
+
+    for(i = 0; i < begin; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (this, i));
+    }
+
+    for(i = 0; i < other->size; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (other, i));
+    }
+
+    for(i = end; i < this->size; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (this, i));
+    }
+
+    return arr;
+}
+
+
+/* Get Range Functions */
+
+Array dampl_arr_get_range__arr (Array this, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Array)));
+    /**************************************/
+
+    for(i = begin; i < end; i++){
+        dampl_arr_append__arr (arr, dampl_arr_get__arr (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_get_range__int (Array this, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(int)));
+    /**************************************/
+
+    for(i = begin; i < end; i++){
+        dampl_arr_append__int (arr, dampl_arr_get__int (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_get_range__float (Array this, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Float)));
+    /**************************************/
+
+    for(i = begin; i < end; i++){
+        dampl_arr_append__float (arr, dampl_arr_get__float (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_get_range__str (Array this, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(String)));
+    /**************************************/
+
+    for(i = begin; i < end; i++){
+        dampl_arr_append__str (arr, dampl_arr_get__str (this, i));
+    }
+
+    return arr;
+}
+
+Array dampl_arr_get_range__tup (Array this, int index1, int index2){
+    int i;
+    int begin, end;
+
+    begin = get_begin(index1, this->size);
+    end = get_end(index2, this->size);
+
+    if(end < begin){
+        end = begin;
+    }
+
+    /**************************************/
+    Array arr = dampl_arr_new();
+    /* or */
+    //int new_size = this->size - (end - begin) + other->size;
+    //Array arr = (Array) malloc (sizeof(Array*));
+    //arr->size = new_size;
+    //arr->capacity = new_size;
+    //arr->a = malloc(new_size*(sizeof(Tuple)));
+    /**************************************/
+
+    for(i = begin; i < end; i++){
+        dampl_arr_append__tup (arr, dampl_arr_get__tup (this, i));
     }
 
     return arr;

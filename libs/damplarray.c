@@ -57,6 +57,120 @@ Tuple dampl_arr_append__tup (Array this, Tuple value)
     return ((Tuple *) this->a)[this->size++] = value;
 }
 
+/* Insert */
+
+Array dampl_arr_insert__arr (Array this, int index, Array value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    dampl_arr_ensure_cap__arr (this, this->size + 1);
+
+    /* Insert into array */
+
+    int i;
+    for (i = this->size++; i > index; i--)
+    {
+        ((Array *) this->a)[i] = ((Array *) this->a)[i - 1];
+    }
+    return ((Array *) this->a)[i] = value;
+}
+
+int dampl_arr_insert__int (Array this, int index, int value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    dampl_arr_ensure_cap__int (this, this->size + 1);
+
+    /* Insert into array */
+
+    int i;
+    for (i = this->size++; i > index; i--)
+    {
+        ((int *) this->a)[i] = ((int *) this->a)[i - 1];
+    }
+    return ((int *) this->a)[i] = value;
+
+}
+
+float dampl_arr_insert__float (Array this, int index, float value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    dampl_arr_ensure_cap__float (this, this->size + 1);
+
+    /* Insert into array */
+
+    int i;
+    for (i = this->size++; i > index; i--)
+    {
+        ((float *) this->a)[i] = ((float *) this->a)[i - 1];
+    }
+    return ((float *) this->a)[i] = value;
+}
+
+String dampl_arr_insert__str (Array this, int index, String value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    dampl_arr_ensure_cap__str (this, this->size + 1);
+
+    /* Insert into array */
+
+    int i;
+    for (i = this->size++; i > index; i--)
+    {
+        ((String *) this->a)[i] = ((String *) this->a)[i - 1];
+    }
+    return ((String *) this->a)[i] = value;
+}
+
+Tuple dampl_arr_insert__tup (Array this, int index, Tuple value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    dampl_arr_ensure_cap__tup (this, this->size + 1);
+
+    /* Insert into array */
+
+    int i;
+    for (i = this->size++; i > index; i--)
+    {
+        ((Tuple *) this->a)[i] = ((Tuple *) this->a)[i - 1];
+    }
+    return ((Tuple *) this->a)[i] = value;
+}
+
+
 /* Ensure capacity */
 
 void dampl_arr_ensure_cap__arr (Array this, int sz)

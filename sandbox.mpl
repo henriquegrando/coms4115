@@ -1,9 +1,7 @@
 	
-a="Hello";
-b="World";
-c=a+b;
-print(c);
-
+a=[1];
+b=[1];
+a[1:2]=b;
 
 /*
 fun foo() {

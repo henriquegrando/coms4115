@@ -59,10 +59,14 @@ let rec string_of_obj = function
     SId(s) -> "dampl_" ^ s
   | SBrac(o,e,_,t) -> "dampl_arr_get__" ^ simple_string_of_typ t ^ "("
       ^ string_of_obj o ^ "," ^ string_of_expr e ^ ")"
-  | SBrac2(o,e1,e2,t) ->
+  | SBrac2(o,e1,e2,typ) ->
       let e1 = if e1 = SNoexpr then empty_inx else e1 in
       let e2 = if e2 = SNoexpr then empty_inx else e2 in
-      "dampl_arr_get_range__arr(" ^ string_of_obj o ^ ","
+      let arrtyp = (match typ with
+              Array(t) -> t
+            | _ -> raise(Failure("attr of table failure"))
+          ) in
+        "dampl_arr_get_range__"^simple_string_of_typ arrtyp^"(" ^ string_of_obj o ^ ","
       ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ")" 
   | SAttr(otyp,atyp,o,name,inx) -> (match otyp with
         Tuple(tname) -> "dampl_tup_get__"^simple_string_of_typ atyp^"("
@@ -95,7 +99,9 @@ and string_of_expr = function
   | SStrLit(s) -> s
   | SObj(o) -> string_of_obj o
   | SBinop(t, e1, o, e2) -> ( match t with
-        String -> (match o with
+        Array(t2) -> "( dampl_arr_concat__"^simple_string_of_typ t2^"("^ string_of_expr e1
+          ^ "," ^ string_of_expr e2 ^ ") )"
+      | String -> ( match o with
             Add -> "( dampl_str_concat("^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ") )"
           | Equal | Neq | Less | Leq | Greater | Geq ->
               "( strcmp("^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ ") "^string_of_op o^" 0 )"
@@ -111,10 +117,14 @@ and string_of_expr = function
          else ( "dampl_arr_" ^ set_or_insert is_ins ^ "__" ^ simple_string_of_typ t
          ^ "(" ^ string_of_obj o2 ^ "," ^ string_of_expr e2 ^ "," ^ string_of_expr e ^ ")" )
       )
-      | SBrac2(o2,e21,e22,_) ->
+      | SBrac2(o2,e21,e22,typ) ->
         let e21 = if e21 = SNoexpr then empty_inx else e21 in
         let e22 = if e22 = SNoexpr then empty_inx else e22 in
-        "dampl_arr_set_range__arr(" ^ string_of_obj o2 ^ ","
+        let arrtyp = (match typ with
+              Array(t) -> t
+            | _ -> raise(Failure("attr of table failure"))
+          ) in
+        "dampl_arr_set_range__"^simple_string_of_typ arrtyp^"(" ^ string_of_obj o2 ^ ","
         ^ string_of_expr e21 ^ "," ^ string_of_expr e22 ^ "," ^ string_of_expr e ^ ")"
       | SAttr(otyp,atyp,o2,name,inx) -> (match otyp with
           Tuple(tname) -> "dampl_tup_set__"^simple_string_of_typ t^"("

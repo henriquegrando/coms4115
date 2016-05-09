@@ -402,7 +402,14 @@ and convert_expr (exp : expr) : sem_expr = match exp with
   | Binop(e1,op,e2) -> 
     let seme1 = convert_expr e1 in let seme2 = convert_expr e2 in
     let e1typ = get_expr_typ seme1 in let e2typ = get_expr_typ seme2 in
-    if is_logical_op op then
+    if (is_array e1typ) || (is_array e2typ) then
+    ( if op = Add then
+        if e1typ = e2typ then
+        SBinop(e1typ,seme1,op,seme2)
+        else raise(Failure("array concat operands must have same type"))
+      else raise(Failure("invalid array operation"))
+    )
+    else if is_logical_op op then
     ( if ((e1typ = Bool || e1typ = Int) && (e2typ = Bool || e2typ = Int))
       then SBinop(Bool,seme1,op,seme2)
       else raise(Failure("invalid type on logical operation"))

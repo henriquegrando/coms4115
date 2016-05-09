@@ -170,6 +170,139 @@ Tuple dampl_arr_insert__tup (Array this, int index, Tuple value)
     return ((Tuple *) this->a)[i] = value;
 }
 
+/* Set */
+
+Array dampl_arr_set__arr (Array this, int index, Array value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((Array *) this->a)[index] = value;
+}
+
+int dampl_arr_set__int (Array this, int index, int value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((int *) this->a)[index] = value;
+}
+
+float dampl_arr_set__float (Array this, int index, float value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((float *) this->a)[index] = value;
+}
+
+String dampl_arr_set__str (Array this, int index, String value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((String *) this->a)[index] = value;
+} 
+
+Tuple dampl_arr_set__tup (Array this, int index, Tuple value)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((Tuple *) this->a)[index] = value;
+} 
+
+/* Get */
+
+Array dampl_arr_get__arr (Array this, int index)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((Array *) this->a)[index];
+}
+
+int dampl_arr_get__int (Array this, int index)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((int *) this->a)[index];
+}
+
+float dampl_arr_get__float (Array this, int index)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((float *) this->a)[index];
+}
+
+String dampl_arr_get__str (Array this, int index)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((String *) this->a)[index];
+}
+
+Tuple dampl_arr_get__tup (Array this, int index)
+{
+    /* Check border conditions */
+
+    if (index >= this->size || index < 0)
+    {
+        fprintf(stderr, "Array out of bounds exception\n");
+        exit(1);
+    }
+
+    return ((Tuple *) this->a)[index];
+}
 
 /* Ensure capacity */
 

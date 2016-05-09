@@ -60,7 +60,7 @@ float dampl_arr_set__float (Array, int, float);
 
 String dampl_arr_set__str (Array, int, String); 
 
-Tuple dampl_arr_set__tup (Array, Tuple); 
+Tuple dampl_arr_set__tup (Array, int, Tuple); 
 
 /* Array get method 
    Returns an element in a given position */

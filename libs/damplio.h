@@ -2,6 +2,7 @@
 #define _DAMPL_IO_
 
 #include "damplstr.h"
+#include "damplarray.h"
 
 /*
  * Receives a string as parameter to be printed.

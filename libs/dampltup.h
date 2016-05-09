@@ -14,6 +14,12 @@ typedef struct
 
 Tuple dampl_tup_new (int size);
 
+
+/* Length function */
+
+int dampl_tup_len(Tuple);
+
+
 /* Tuple insertion method */
 
 int dampl_tup_set__int(Tuple, int, int);

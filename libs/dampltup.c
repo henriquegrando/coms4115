@@ -17,9 +17,25 @@ Tuple dampl_tup_new (int size){
 	return tup;
 }
 
+
+/* Length function */
+
+int dampl_tup_len(Tuple tup){
+	return tup->size;
+}
+
 /* Tuple insertion method */
 
 int dampl_tup_set__int(Tuple tup, int index, int data){
+
+	/* Check border conditions */
+
+	if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
+
 	char str[11];
 
 	sprintf(str, "%d", data);
@@ -30,6 +46,15 @@ int dampl_tup_set__int(Tuple tup, int index, int data){
 }
 
 float dampl_tup_set__float(Tuple tup, int index, float data){
+
+	/* Check border conditions */
+
+	if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
+
 	char str[64];
 
 	sprintf(str, "%f", data);
@@ -40,6 +65,15 @@ float dampl_tup_set__float(Tuple tup, int index, float data){
 }
 
 String dampl_tup_set__str(Tuple tup, int index, String data){
+
+    /* Check border conditions */
+
+	if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
+
 	tup->values[index] = dampl_str_copy(data);
 
 	return data;
@@ -50,6 +84,14 @@ int dampl_tup_get__int(Tuple tup, int index){
 	char *str;
 	char *eptr;
     long result;
+
+	/* Check border conditions */
+
+    if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
 
     str = tup->values[index];
 
@@ -64,6 +106,14 @@ float dampl_tup_get__float(Tuple tup, int index){
 	char *eptr;
     double result;
 
+	/* Check border conditions */
+
+    if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
+
     str = tup->values[index];
 
     /* Convert the provided value to a double*/
@@ -73,5 +123,14 @@ float dampl_tup_get__float(Tuple tup, int index){
 }
 
 String dampl_tup_get__str(Tuple tup, int index){
+
+	/* Check border conditions */
+
+	if (index >= tup->size || index < 0)
+    {
+        fprintf(stderr, "Out of bounds exception\n");
+        exit(1);
+    }
+
 	return tup->values[index];
 }

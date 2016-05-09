@@ -41,7 +41,7 @@ do
 
 	./${filename} > ./tests/temp.out
 
-	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 1>&2
+	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
 
 	rm ./tests/temp.out
 	rm ${filename}

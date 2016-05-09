@@ -547,11 +547,7 @@ void dampl_arr_ensure_cap__tup (Array this, int sz)
 Array dampl_arr_concat__arr (Array arr1, Array arr2){
     int i;
 
-    Array arr = (Array) malloc (sizeof(Array*));
-
-    arr->size = arr1->size + arr2->size;
-    arr->capacity = arr1->capacity + arr2->capacity;
-    arr->a = malloc(arr->capacity*sizeof(Array));
+    Array arr = dampl_arr_new();
 
     for(i = 0; i < arr1->size; i++){
         dampl_arr_append__arr (arr, dampl_arr_get__arr (arr1, i));
@@ -567,11 +563,7 @@ Array dampl_arr_concat__arr (Array arr1, Array arr2){
 Array dampl_arr_concat__int (Array arr1, Array arr2){
     int i;
 
-    Array arr = (Array) malloc (sizeof(Array*));
-
-    arr->size = arr1->size + arr2->size;
-    arr->capacity = arr1->capacity + arr2->capacity;
-    arr->a = malloc(arr->capacity*sizeof(int));
+    Array arr = dampl_arr_new();
 
     for(i = 0; i < arr1->size; i++){
         dampl_arr_append__int (arr, dampl_arr_get__int (arr1, i));
@@ -589,13 +581,9 @@ Array dampl_arr_concat__int (Array arr1, Array arr2){
 Array dampl_arr_concat__float (Array arr1, Array arr2){
     int i;
 
-    Array arr = (Array) malloc (sizeof(Array*));
+    Array arr = dampl_arr_new();
 
-    arr->size = arr1->size + arr2->size;
-    arr->capacity = arr1->capacity + arr2->capacity;
-    arr->a = malloc(arr->capacity*sizeof(float));
-
-   for(i = 0; i < arr1->size; i++){
+    for(i = 0; i < arr1->size; i++){
         dampl_arr_append__float (arr, dampl_arr_get__float (arr1, i));
     }
 
@@ -610,11 +598,7 @@ Array dampl_arr_concat__float (Array arr1, Array arr2){
 Array dampl_arr_concat__str (Array arr1, Array arr2){
     int i;
 
-    Array arr = (Array) malloc (sizeof(Array*));
-
-    arr->size = arr1->size + arr2->size;
-    arr->capacity = arr1->capacity + arr2->capacity;
-    arr->a = malloc(arr->capacity*sizeof(String));
+    Array arr = dampl_arr_new();
 
     for(i = 0; i < arr1->size; i++){
         dampl_arr_append__str (arr, dampl_arr_get__str (arr1, i));
@@ -630,11 +614,7 @@ Array dampl_arr_concat__str (Array arr1, Array arr2){
 Array dampl_arr_concat__tup (Array arr1, Array arr2){
     int i;
 
-    Array arr = (Array) malloc (sizeof(Array*));
-
-    arr->size = arr1->size + arr2->size;
-    arr->capacity = arr1->capacity + arr2->capacity;
-    arr->a = malloc(arr->capacity*sizeof(Tuple));
+    Array arr = dampl_arr_new();
 
     for(i = 0; i < arr1->size; i++){
         dampl_arr_append__tup (arr, dampl_arr_get__tup (arr1, i));

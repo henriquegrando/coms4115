@@ -12,4 +12,10 @@ void dampl_print__float (float f);
 
 void dampl_print__int (int i);
 
+Array dampl_strsplit__str (String);
+
+String dampl_readfile__str (String);
+
+void dampl_writefile__str_str (String, String);
+
 #endif

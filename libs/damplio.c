@@ -76,7 +76,21 @@ String dampl_readfile__str (String file_name){
 	return file_str;
 }
 
-void dampl_writefile__str_str (String string1, String string2){
+void dampl_writefile__str_str (String file_name, String str){
+	FILE *fp;
 
 
+   	/* opening file for reading */
+   	fp = fopen(file_name, "a");
+   	if(fp == NULL) {
+		perror("Error opening file");
+      	exit(-1);
+   	}
+
+   	if(fputs(str, fp) == EOF){
+   		perror("Error reading file");
+      	exit(1);
+    }
+
+   	fclose(fp);
 }

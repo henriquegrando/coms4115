@@ -28,10 +28,10 @@ void dampl_arr_print__tup (Array);
 
 
 /* Prints Tuple */
-void dampl_print__tup (Tuple tup){
+void dampl_print__tup (Tuple tup);
 
 
-Array dampl_strsplit__str (String);
+Array dampl_strsplit__str (String, String);
 
 String dampl_readfile__str (String);
 

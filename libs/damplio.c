@@ -71,7 +71,7 @@ void dampl_arr_print__tup (Array arr){
 
 
 void dampl_print__tup (Tuple tup){
-	int i;
+	int i, size;
 
 	size = dampl_tup_len(tup);
 
@@ -93,7 +93,7 @@ Array dampl_strsplit__str (String str, String separator){
 
 	/* walk through other tokens */
 	while( token != NULL ) {
-		token = strtok(NULL, s);
+		token = strtok(NULL, separator);
 		dampl_arr_append__str (arr, token);
 	}
 

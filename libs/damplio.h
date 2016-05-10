@@ -26,7 +26,7 @@ void dampl_arr_print__tup (Array, int);
 
 
 /* Prints Tuple */
-void dampl_print__tup (Tuple tup);
+void dampl_print__tup (Tuple);
 
 
 Array dampl_strsplit__str (String, String);

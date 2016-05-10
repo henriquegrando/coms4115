@@ -27,7 +27,9 @@ void dampl_arr_print__int (Array arr, int dimensions){
     printf("[ ");
 
     if(dimensions == 1){
-      for(i = 0; i < size; i++){
+      dampl_print__int (dampl_arr_get__int (arr, 0));
+      for(i = 1; i < size; i++){
+        printf(", ");
         dampl_print__int (dampl_arr_get__int (arr, i));
       }
     }
@@ -48,7 +50,9 @@ void dampl_arr_print__float (Array arr, int dimensions){
     printf("[ ");
 
     if(dimensions == 1){
-      for(i = 0; i < size; i++){
+      dampl_print__float (dampl_arr_get__float (arr, 0));
+      for(i = 1; i < size; i++){
+        printf(", ");
         dampl_print__float (dampl_arr_get__float (arr, i));
       }
     }
@@ -69,7 +73,9 @@ void dampl_arr_print__str (Array arr, int dimensions){
     printf("[ ");
 
     if(dimensions == 1){
-      for(i = 0; i < size; i++){
+      dampl_print__str (dampl_arr_get__str(arr, 0));
+      for(i = 1; i < size; i++){
+        printf(", ");
         dampl_print__str (dampl_arr_get__str(arr, i));
       }
     }
@@ -90,7 +96,9 @@ void dampl_arr_print__tup (Array arr, int dimensions){
     printf("[ ");
 
     if(dimensions == 1){
-      for(i = 0; i < size; i++){
+      dampl_print__tup (dampl_arr_get__tup(arr, 0));
+      for(i = 1; i < size; i++){
+        printf(", ");
         dampl_print__tup (dampl_arr_get__tup(arr, i));
       }
     }
@@ -127,13 +135,14 @@ Array dampl_strsplit__str (String str, String separator){
 
 	char *token;
 
+  String new_str = dampl_str_copy(str);
+
 	/* get the first token */
-	token = strtok(str, separator);
+	token = strtok(new_str, separator);
 	dampl_arr_append__str (arr, token);
 
 	/* walk through other tokens */
-	while( token != NULL ) {
-		token = strtok(NULL, separator);
+	while((token = strtok(NULL, separator))) {
 		dampl_arr_append__str (arr, token);
 	}
 
@@ -184,7 +193,7 @@ void dampl_writefile__str_str (String file_name, String str){
 
 
    	/* opening file for reading */
-   	fp = fopen(file_name, "a");
+   	fp = fopen(file_name, "w");
    	if(fp == NULL) {
 		perror("Error opening file");
       	exit(-1);

@@ -5,6 +5,12 @@
 
 #include "damplstr.h"
 
+typedef enum{
+	real,
+	integer,
+	text
+} type_map;
+
 typedef struct
 {
     String* values;
@@ -12,7 +18,7 @@ typedef struct
 } * Tuple;
 
 
-Tuple dampl_tup_new (int size);
+Tuple dampl_tup_new (int size, tuple_type);
 
 
 /* Length function */
@@ -36,5 +42,6 @@ float dampl_tup_get__float(Tuple, int);
 String dampl_tup_get__str(Tuple, int);
 
 
+Tuple dampl_tup_convert(Array);
 
 #endif

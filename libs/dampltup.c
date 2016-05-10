@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "dampltup.h"
 
-Tuple dampl_tup_new (int size){
+Tuple dampl_tup_new (int size, type_map* type){
 	int i;
 
 	Tuple tup = malloc(sizeof(Tuple*));
@@ -11,7 +11,18 @@ Tuple dampl_tup_new (int size){
 	tup->values = malloc(size*sizeof(String*));
 
 	for(i = 0; i < size; i++){
-		tup->values[i] = dampl_str_copy("");
+        switch(type[i]){
+            case real:
+                tup->values[i] = dampl_str_copy("0.0");
+                break;
+            case integer:
+                tup->values[i] = dampl_str_copy("0");
+                break;
+            case text:
+                tup->values[i] = dampl_str_copy("");
+                break;
+        }
+		
 	}
 
 	return tup;
@@ -133,4 +144,16 @@ String dampl_tup_get__str(Tuple tup, int index){
     }
 
 	return tup->values[index];
+}
+
+Tuple dampl_tup_convert(Array arr, type_map* type){){
+
+    int size = arr->size
+    Tuple tup = dampl_tup_new (size, type);
+
+    for(i = 0; i < size; i++){
+        dampl_tup_set__str(tup, i, dampl_arr_get__str (arr, i));
+    }
+    
+    return tup;
 }

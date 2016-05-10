@@ -990,3 +990,20 @@ Array dampl_arr_get_range__tup (Array this, int index1, int index2){
 
     return arr;
 }
+
+Tuple dampl_tup_convert(Array arr, int size, type_map type){
+    int i;
+
+    if(arr->size != size){
+        fprintf(stderr, "Incompatible sizes for array and tuple\n");
+        exit(1);   
+    }
+
+    Tuple tup = dampl_tup_new (size, type);
+
+    for(i = 0; i < size; i++){
+        dampl_tup_set__str(tup, i, dampl_arr_get__str (arr, i));
+    }
+    
+    return tup;
+}

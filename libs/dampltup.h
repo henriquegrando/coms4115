@@ -9,16 +9,17 @@ typedef enum{
 	real,
 	integer,
 	text
-} type_map;
+} * type_map;
 
 typedef struct
 {
     String* values;
     int size;
+    type_map map;
 } * Tuple;
 
 
-Tuple dampl_tup_new (int size, tuple_type);
+Tuple dampl_tup_new (int size, type_map);
 
 
 /* Length function */
@@ -41,7 +42,5 @@ float dampl_tup_get__float(Tuple, int);
 
 String dampl_tup_get__str(Tuple, int);
 
-
-Tuple dampl_tup_convert(Array);
 
 #endif

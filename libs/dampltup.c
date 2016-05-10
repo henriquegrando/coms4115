@@ -2,11 +2,12 @@
 #include <stdio.h>
 #include "dampltup.h"
 
-Tuple dampl_tup_new (int size, type_map* type){
+Tuple dampl_tup_new (int size, type_map type){
 	int i;
 
 	Tuple tup = malloc(sizeof(Tuple*));
 	tup->size = size;
+    tup->map = type;
 
 	tup->values = malloc(size*sizeof(String*));
 
@@ -76,23 +77,41 @@ float dampl_tup_set__float(Tuple tup, int index, float data){
 }
 
 String dampl_tup_set__str(Tuple tup, int index, String data){
+    char *eptr;
+    double result_d;
+    long result_l;
 
-    /* Check border conditions */
+    switch(tup->map[index]){
+        case real:
+            /* Convert the provided value to a double */
+            result_d = strtod(data, &eptr);
+            dampl_tup_set__float(tup, index, (float)result_d);
+            break;
 
-	if (index >= tup->size || index < 0)
-    {
-        fprintf(stderr, "Out of bounds exception\n");
-        exit(1);
+        case integer:
+            /* Convert the provided value to a long */
+            result_l = strtol(data, &eptr, 10);
+            dampl_tup_set__int(tup, index, (int)result_l);
+            break;
+
+        case text:
+            /* Check border conditions */
+
+            if (index >= tup->size || index < 0){
+                fprintf(stderr, "Out of bounds exception\n");
+                exit(1);
+            }
+
+            tup->values[index] = dampl_str_copy(data);
+            break;
     }
-
-	tup->values[index] = dampl_str_copy(data);
-
-	return data;
+    
+	return tup->values[index];
 }
 
 
 int dampl_tup_get__int(Tuple tup, int index){
-	char *str;
+	String str;
 	char *eptr;
     long result;
 
@@ -144,16 +163,4 @@ String dampl_tup_get__str(Tuple tup, int index){
     }
 
 	return tup->values[index];
-}
-
-Tuple dampl_tup_convert(Array arr, type_map* type){){
-
-    int size = arr->size
-    Tuple tup = dampl_tup_new (size, type);
-
-    for(i = 0; i < size; i++){
-        dampl_tup_set__str(tup, i, dampl_arr_get__str (arr, i));
-    }
-    
-    return tup;
 }

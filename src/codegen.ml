@@ -191,12 +191,12 @@ and string_of_stmt = function
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   
   | SFor(str,t, e, s) -> "{\n"
-      ^ string_of_typ t ^ " dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(0);\n"
+      ^ string_of_typ t ^ " dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"("^ string_of_expr e ^",0);\n"
       ^ "int i_"^str ^ " = 0;\n"
       ^ "while(i_"^str^" < dampl_arr_len(" ^ string_of_expr e ^ ") ) {\n" 
-        ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(i_"^str ^ ");\n"
+        ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"("^ string_of_expr e ^",i_"^str ^ ");\n"
       ^string_of_stmts ( match s with SBlock(sl) -> sl | stmt -> [stmt] )
-      ^"i_"^str^"++;\n}\n"
+      ^"i_"^str^"++;\n}\n}\n"
   
      (* "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s

@@ -8,6 +8,7 @@ Tuple dampl_tup_new (int size, type_map* type){
 	Tuple tup = malloc(sizeof(Tuple*));
 	tup->size = size;
     tup->map = type;
+    
 
 	tup->values = malloc(size*sizeof(String*));
 
@@ -80,6 +81,7 @@ String dampl_tup_set__str(Tuple tup, int index, String data){
     char *eptr;
     double result_d;
     long result_l;
+
 
     switch(tup->map[index]){
         case real:

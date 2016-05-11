@@ -4,6 +4,7 @@
 #include "damplstr.h"
 #include "dampltup.h"
 #include <stdlib.h>
+#include <limits.h>
 
 /* Array structure */
 

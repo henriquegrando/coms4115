@@ -47,7 +47,7 @@ String dampl_str_arr__int (Array arr, int dimensions){
     }
     else{
       for(i = 0; i < size; i++){
-        dampl_str_arr__int (dampl_arr_get__arr (arr, i), dimensions-1);
+        str = dampl_str_concat(str,dampl_str_arr__int (dampl_arr_get__arr (arr, i), dimensions-1));
       }
     }
 

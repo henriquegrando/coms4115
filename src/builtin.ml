@@ -12,6 +12,7 @@ let built_in_prototypes = [
     [String];
     [Int];
     [Float];
+    [Bool];
   ]);
   (Float,"float",[
     [String];

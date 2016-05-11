@@ -3,6 +3,7 @@ open Semt
 open Stack
 module StringMap = Map.Make(String);;
 open Builtin
+open Codegen
 
 let param_separator = "__"
 
@@ -619,8 +620,7 @@ and convert_assign o e = (
 
 and handle_special_function (name : string) (exprs : expr list) : sem_expr =
   match name with
-  (* len call for arrays or tables *)
-  "len" -> ( match exprs with
+  "len" -> ( match exprs with (* len call for arrays or tables *)
     [Obj(o)] -> ( match (get_obj_typ (convert_obj_checking_side o true)) with
           Table(_) -> SSpecialCall(Int,"dampl_arr_len",(convert_exprs exprs))
         | Array(_) -> SSpecialCall(Int,"dampl_arr_len",(convert_exprs exprs))
@@ -629,6 +629,19 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
       )
     | _ -> SNoexpr
     )
+  | "print" -> (
+      let rec get_array_dimension_and_type arr n = ( match arr with
+          Array(t) -> get_array_dimension_and_type t (n+1)
+        | t -> (n,t)
+        ) in
+      let semexprs = convert_exprs exprs in
+      let typs = List.map get_expr_typ semexprs in
+      match typs with
+        [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
+          let tstr = Codegen.simple_string_of_typ typ in
+          SSpecialCall(Void,"dampl_print_arr__"^tstr,semexprs@[(SLiteral(dim))])
+       | _ -> SNoexpr
+  )
 
   | _ -> SNoexpr (* No special behavior *)
 

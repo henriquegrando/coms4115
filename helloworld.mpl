@@ -12,8 +12,6 @@ fun bar(a) {
 	return foo(a);
 }
 
-b=1;
-bar(1.1);
 
 fun lastone() {
 	print("bye!\n");

@@ -6,3 +6,5 @@ fun saypingpong() {
 	sayping();
 	print("pong");
 }
+
+saypingpong();

@@ -49,6 +49,7 @@ do
 
 		rm ./tests/temp.out
     	
+    	echo "Done."
     	continue
 	else 
 		echo "Generating the executable file ..."
@@ -61,5 +62,7 @@ do
 
 		rm ./tests/temp.out
 		rm ${filename}
+
+		echo "Done."
 	fi
 done

@@ -1,9 +1,14 @@
-fun readCSV(filename){
+fun readCSV(filename,tup){
 	file = readfile(filename);
 	table = strsplit(file,"\n");
 
-	for i in table{
+	size = len(table);
+
+	new_table = [];
+	i = 0;
+	while(i < size){
 		new_table[] = strsplit(i,",");
+		i = i+1;
 	}
 
 	return new_table;
@@ -52,6 +57,18 @@ fun invert(arr){
 	return new_arr;
 }
 
+fun tuple_to_array(tup){
+	arr = [];
+
+	i = 0;
+
+	while(i < len(tup)){
+		arr[] = str(tup$(i));
+		i = i+1;
+	}
+
+	return arr;
+}
 
 fun range(begin, end){
 	i = begin;

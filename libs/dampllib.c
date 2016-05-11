@@ -7,9 +7,9 @@ String dampl_str__str (String string) {
 }
 
 String dampl_str__float (float f){
-	int size = snprintf(NULL, 0, "%.2f", f);
+	int size = snprintf(NULL, 0, "%g", f);
 	char *s = malloc(size + 1);
-	sprintf(s, "%.2f", f);
+	sprintf(s, "%g", f);
 	return s;
 }
 
@@ -20,6 +20,13 @@ String dampl_str__int (int i) {
 	return s;
 }
 
+String dampl_str__bool (int b){
+  String str;
+  if (b) str = dampl_str_copy("true");
+  else str = dampl_str_copy("false");
+
+  return str;
+}
 
 
 String dampl_str_arr__int (Array arr, int dimensions){

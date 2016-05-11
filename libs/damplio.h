@@ -13,6 +13,7 @@ void dampl_print__float (float f);
 
 void dampl_print__int (int i);
 
+void dampl_print__bool (int);
 
 /* Prints array */
 

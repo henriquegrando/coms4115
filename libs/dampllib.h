@@ -13,6 +13,8 @@ String dampl_str__float (float f);
 
 String dampl_str__int (int i);
 
+String dampl_str__bool (int);
+
 
 String dampl_str_arr__int (Array, int);
 

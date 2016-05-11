@@ -14,7 +14,7 @@ void dampl_print__str (String string)
 
 void dampl_print__float (float f)
 {
-    printf("%.2f", f);
+    printf("%g", f);
 }
 
 void dampl_print__int (int i)
@@ -22,8 +22,8 @@ void dampl_print__int (int i)
     printf("%d", i);
 }
 
-void dampl_print__bool (int i){
-  if (i) printf("true");
+void dampl_print__bool (int b){
+  if (b) printf("true");
   else printf("false");
 }
 

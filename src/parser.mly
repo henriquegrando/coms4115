@@ -58,7 +58,7 @@ tdecl_or_fdecl:
   | tdecl { $1 }
 
 fdecl:
-  FUN ID LPAREN formals_opt RPAREN LBRACE in_fun_stmt_list RBRACE
+  FUN ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
      { Func({ fname = $2;
 	 formals = $4;
 	 locals = [];
@@ -102,15 +102,9 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | BREAK SEMI { Break }
   | CONTINUE SEMI { Continue }
-
-in_fun_stmt_list:
-    /* nothing */  { [] }
-  | in_fun_stmt_list in_fun_stmt { $2 :: $1 }
-
-in_fun_stmt:
-    stmt { $1 }
   | RETURN SEMI { Return Noexpr }
   | RETURN expr SEMI { Return $2 }
+
 
 obj:
     ID               { Id($1) }

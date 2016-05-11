@@ -504,7 +504,9 @@ and convert_stmt stmt = match stmt with
   | Expr(exp) -> (* print_string("E_in "^(Stack.top fun_parser_stack)^"\n"); *)
       SExpr(convert_expr exp)
   | Return(exp) -> (* print_string("R_in "^(Stack.top fun_parser_stack)^"\n"); *)
-      SReturn(convert_expr exp)
+      if (Stack.top fun_parser_stack) <> "_global_" then
+        SReturn(convert_expr exp)
+      else raise(Failure("Illegal return outside function"))
   | If(exp,s1,s2) ->
       let semexpr = convert_expr exp in
       let typ = get_expr_typ semexpr in
@@ -580,8 +582,8 @@ and convert_assign o e = (
         let tupname = (get_tuple_name expectedtyp) in
         let tupsize = StringMap.find tupname !tup_sizes in 
         let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
-        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
-        SAssign(expr_typ,semobj,newexp)
+        let newexp = (SSpecialCall(Tuple(tupname),"dampl_tup_convert",params)) in
+        SAssign(Tuple(tupname),semobj,newexp)
       else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
     ) else ( add_id_to_map globals semobj expr_typ; 
     SAssign(expr_typ,semobj, semexpr)
@@ -610,8 +612,8 @@ and convert_assign o e = (
         let tupname = (get_tuple_name expectedtyp) in
         let tupsize = StringMap.find tupname !tup_sizes in 
         let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
-        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
-        SAssign(expr_typ,semobj,newexp)
+        let newexp = (SSpecialCall(Tuple(tupname),"dampl_tup_convert",params)) in
+        SAssign(Tuple(tupname),semobj,newexp)
       else raise(Failure("cant change var "^(get_string_of_sem_obj semobj)^" type"))
     ) else (
       (* check if it is a global *)
@@ -635,8 +637,8 @@ and convert_assign o e = (
           let tupname = (get_tuple_name expectedtyp) in
           let tupsize = StringMap.find tupname !tup_sizes in 
           let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
-          let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
-          SAssign(expr_typ,semobj,newexp)
+          let newexp = (SSpecialCall(Tuple(tupname),"dampl_tup_convert",params)) in
+          SAssign(Tuple(tupname),semobj,newexp)
         else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
         (* if not local or global, create new local var *)
       ) else ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
@@ -668,6 +670,8 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
         [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
           let tstr = Codegen.simple_string_of_typ typ in
           SSpecialCall(Void,"dampl_print_arr__"^tstr,semexprs@[(SLiteral(dim))])
+      | [Table(tname)] ->
+          SSpecialCall(Void,"dampl_print_arr__tup",semexprs@[(SLiteral(1))])
       | [Tuple(name)] -> 
           SSpecialCall(Void,"dampl_print__tup",semexprs)
       | _ -> SNoexpr
@@ -683,6 +687,8 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
         [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
           let tstr = Codegen.simple_string_of_typ typ in
           SSpecialCall(String,"dampl_str_arr__"^tstr,semexprs@[(SLiteral(dim))])
+      | [Table(tname)] ->
+          SSpecialCall(Void,"dampl_str_arr__tup",semexprs@[(SLiteral(1))])
       | [Tuple(name)] -> 
           SSpecialCall(String,"dampl_str__tup",semexprs)
       | _ -> SNoexpr

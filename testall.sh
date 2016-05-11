@@ -37,6 +37,12 @@ Build() {
 }
 
 Test() {
+	if [ -s files_to_check.txt ]; then
+		rm files_to_check.txt
+	fi
+
+	echo "These files presented different output than expected during the automated test.\n" >> files_to_check.txt
+
 	for file in $files
 	do
 		echo ""
@@ -56,6 +62,7 @@ Test() {
 			if [ -s ${filename}.diff ]
 			then
 				echo "WARNING: Output differs from expected."
+				echo "${filename}\n" >> files_to_check.txt
 			fi
 	    	
 	    	echo "Done."
@@ -68,6 +75,12 @@ Test() {
 			./${filename} > ./tests/temp.out 2>&1
 
 			diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
+
+			if [ -s ${filename}.diff ]
+			then
+				echo "WARNING: Output differs from expected."
+				echo "${filename}\n" >> files_to_check.txt
+			fi
 
 			rm ./tests/temp.out
 			rm ${filename}

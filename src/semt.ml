@@ -6,7 +6,7 @@ module StringMap = Map.Make(String);;
 
 type typed_id = typ * string
 
-type sem_tup = string * typed_id list (* tuple creation *)
+(* type sem_tup = string * typed_id list *)
 
 type sem_obj = (* lhs *)
     SId of string
@@ -77,4 +77,4 @@ type sem_program =
   typed_id list *
   sem_stmt list *
   sem_func_decl list * 
-  sem_tup list
+  tup list

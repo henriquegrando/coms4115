@@ -757,12 +757,12 @@ let create_tup_decl tdecl =
 
 let rec create_tups_from_decls decls = match decls with
     Func(_)::l -> create_tups_from_decls l
-  | Tup(t)::l -> create_tup_decl t; create_tups_from_decls l
-  | [] -> ();;
+  | Tup(t)::l -> create_tup_decl t; t::(create_tups_from_decls l)
+  | [] -> [];;
 
 
 let convert (stmts, decls) =
-  create_tups_from_decls decls;
+  let tups = create_tups_from_decls decls in
   (Stack.push "_global_" fun_parser_stack);
   (Stack.push 0 loop_stack);
   create_funs_from_decls decls;
@@ -773,7 +773,7 @@ let convert (stmts, decls) =
     (StringMap.fold globals_map_to_list_fold_helper !globals []),
     semstmts,
     (StringMap.fold fun_map_to_list_fold_helper !parsed_funs []),
-    []
+    tups
   );;
 
 

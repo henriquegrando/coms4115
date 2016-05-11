@@ -55,6 +55,15 @@ let set_or_insert t =
 
 let empty_inx = SString("INT_MIN")
 
+let mapping_of_tup (t : tup) : string =
+  let string_of_attr_type t = ( match fst t with
+      String -> "text"
+    | Float -> "real"
+    | Int -> "integer"
+    | _ -> raise(Failure("tuple mapping failure")) ) in
+  "type_map map"^fst t^" = {"
+    ^(String.concat ", " (List.map string_of_attr_type (snd t)))^"};\n"
+
 let rec string_of_obj = function
     SId(s) -> "dampl_" ^ s
   | SBrac(o,e,_,t) -> "dampl_arr_get__" ^ simple_string_of_typ t ^ "("
@@ -160,7 +169,7 @@ and string_of_expr = function
           ^"a;})"
       )
   | STabInst(_) -> "dampl_arr_new()"
-  | STupInst(name,n) -> "dampl_tup_new("^string_of_int n^")"
+  | STupInst(name,n) -> "dampl_tup_new("^string_of_int n^",map"^name^")"
   (*
   | STupInst of string (* tuple instantiation *)
   | STabInst of string (* table instantiation e.g. Foo[] *)
@@ -222,6 +231,7 @@ let string_of_fdecl fdecl =
 let string_of_program (globals, statements, functions, tuples) = 
   "#include <stdio.h>\n" ^ "#include <stdlib.h>\n" ^
   "#include \"dampllib.h\"\n\n" ^
+  String.concat "" (List.map mapping_of_tup tuples) ^ "\n" ^
   String.concat "" (List.map string_of_global globals) ^ "\n" ^
   String.concat "" (List.map fdecl_prototype functions) ^ "\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^

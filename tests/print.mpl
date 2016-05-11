@@ -26,17 +26,12 @@ arr_str = ["hello", "bonjour", "ola"];
 arr_tup = [t2, t];
 
 print(arr_int);
-print("\n");
 print(arr_float);
-print("\n");
 print(arr_str);
-print("\n");
 print(arr_tup);
-print("\n");
 
 arr_str2 = ["world", "monde", "mundo"];
 
 arr_arr = [arr_str, arr_str2];
 
 print(arr_arr);
-print("\n");

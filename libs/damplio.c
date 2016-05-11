@@ -22,6 +22,10 @@ void dampl_print__int (int i)
     printf("%d", i);
 }
 
+void dampl_print__bool (int i){
+  if (i) printf("true");
+  else printf("false");
+}
 
 void dampl_print_arr__int (Array arr, int dimensions){
     int i, size;

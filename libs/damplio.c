@@ -47,7 +47,7 @@ void dampl_print_arr__int (Array arr, int dimensions){
       }
     }
 
-    printf(" ]");
+    printf(" ]\n");
 }
 
 void dampl_print_arr__float (Array arr, int dimensions){
@@ -70,7 +70,7 @@ void dampl_print_arr__float (Array arr, int dimensions){
       }
     }
 
-    printf(" ]");
+    printf(" ]\n");
 }
 
 void dampl_print_arr__str (Array arr, int dimensions){
@@ -93,7 +93,7 @@ void dampl_print_arr__str (Array arr, int dimensions){
       }
     }
 
-    printf(" ]");
+    printf(" ]\n");
 }
 
 void dampl_print_arr__tup (Array arr, int dimensions){
@@ -116,7 +116,7 @@ void dampl_print_arr__tup (Array arr, int dimensions){
       }
     }
 
-    printf(" ]");
+    printf(" ]\n");
 }
 
 
@@ -146,11 +146,13 @@ Array dampl_strsplit__str_str (String str, String separator){
 
 	/* get the first token */
 	token = strtok(new_str, separator);
-	dampl_arr_append__str (arr, token);
+  String new_token = dampl_str_copy(token);
+	dampl_arr_append__str (arr, new_token);
 
 	/* walk through other tokens */
 	while((token = strtok(NULL, separator))) {
-		dampl_arr_append__str (arr, token);
+    String new_token = dampl_str_copy(token);
+		dampl_arr_append__str (arr, new_token);
 	}
 
 	return arr;
@@ -307,7 +309,6 @@ String dampl_readline__int(int index){
   fp = (FILE*) arr_get__file (index);
   
   while((c = fgetc(fp)) != EOF){
-    //printf("%d\n", count);
     if(c == '\n') break;
     count++;
   }

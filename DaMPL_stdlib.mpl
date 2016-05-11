@@ -1,30 +1,43 @@
-fun readCSV(filename,tup){
+fun readCSV(filename,tab){
 	file = readfile(filename);
-	table = strsplit(file,"\n");
+	table = strsplit(file,"\r\n");
 
 	size = len(table);
-
-	new_table = [];
-	i = 0;
+	
+	i=0;
 	while(i < size){
-		new_table[] = strsplit(i,",");
+		tab[] = strsplit(table[i],",");
 		i = i+1;
 	}
 
-	return new_table;
 }
 
 
 fun join(arr, separator){
-	i = 1;
+	join__i = 1;
 	
-	size = len(arr);
+	join__size = len(arr);
 
 	new_str = arr[0];
 
-	while(i < size){
-		new_str = new_str + separator + arr[i];
-		i = i + 1;
+	while(join__i < join__size){
+		new_str = new_str + separator + arr[join__i];
+		join__i = join__i + 1;
+	}
+
+	return new_str;
+}
+
+fun join_tuple(tup, separator){
+	join__tuple_i = 1;
+	
+	join__tuple_size = len(tup);
+
+	new_str = tup$(0);
+
+	while(join__tuple_i < join__tuple_size){
+		new_str = new_str + separator + tup$(join__tuple_i);
+		join__tuple_i = join__tuple_i + 1;
 	}
 
 	return new_str;
@@ -37,7 +50,7 @@ fun writeCSV(table,file){
 	size = len(table);
 
 	while(i < size){
-		str = str + join(table[i],",") + "\n";
+		str = str + join_tuple(table[i],",") + "\n";
 		i = i+1;
 	}
 

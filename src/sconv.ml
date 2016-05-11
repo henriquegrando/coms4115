@@ -11,7 +11,7 @@ let fun_decls = ref StringMap.empty;;
 
 let fun_abodies = ref StringMap.empty;;
 
-let globals = ref StringMap.empty;;
+let globals = ref (StringMap.singleton "args" (Array(String)) );;
 
 let funs_to_reparse = ref [];;
 

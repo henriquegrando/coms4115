@@ -24,6 +24,8 @@ String dampl_str_arr__tup (Array, int);
 
 String dampl_str__tup (Tuple);
 
+Array build_args_array(String*);
+
 
 void dampl_die__(void);
 

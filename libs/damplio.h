@@ -16,13 +16,13 @@ void dampl_print__int (int i);
 
 /* Prints array */
 
-void dampl_arr_print__int (Array, int);
+void dampl_print_arr__int (Array, int);
 
-void dampl_arr_print__float (Array, int);
+void dampl_print_arr__float (Array, int);
 
-void dampl_arr_print__str (Array, int);
+void dampl_print_arr__str (Array, int);
 
-void dampl_arr_print__tup (Array, int);
+void dampl_print_arr__tup (Array, int);
 
 
 /* Prints Tuple */

@@ -15,7 +15,7 @@ typedef struct
 {
     String* values;
     int size;
-    type_map map;
+    type_map* map;
 } * Tuple;
 
 

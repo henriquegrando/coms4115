@@ -75,7 +75,7 @@ String dampl_str_arr__float (Array arr, int dimensions){
     }
     else{
       for(i = 0; i < size; i++){
-        dampl_str_arr__float (dampl_arr_get__arr (arr, i), dimensions-1);
+        str = dampl_str_concat(str,dampl_str_arr__float (dampl_arr_get__arr (arr, i), dimensions-1));
       }
     }
 
@@ -102,7 +102,7 @@ String dampl_str_arr__str (Array arr, int dimensions){
     }
     else{
       for(i = 0; i < size; i++){
-        dampl_str_arr__str (dampl_arr_get__arr (arr, i), dimensions-1);
+        str = dampl_str_concat(str,dampl_str_arr__str (dampl_arr_get__arr (arr, i), dimensions-1));
       }
     }
 
@@ -129,7 +129,7 @@ String dampl_str_arr__tup (Array arr, int dimensions){
     }
     else{
       for(i = 0; i < size; i++){
-        dampl_str_arr__str (dampl_arr_get__arr (arr, i), dimensions-1);
+        str = dampl_str_concat(str,dampl_str_arr__str (dampl_arr_get__arr (arr, i), dimensions-1));
       }
     }
 

@@ -132,6 +132,7 @@ and string_of_expr = function
         let e22 = if e22 = SNoexpr then empty_inx else e22 in
         let arrtyp = (match typ with
               Array(t) -> t
+            | Table(tname) -> Tuple(tname)
             | _ -> raise(Failure("attr of table failure"))
           ) in
         "dampl_arr_set_range__"^simple_string_of_typ arrtyp^"(" ^ string_of_obj o2 ^ ","

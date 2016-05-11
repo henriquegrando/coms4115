@@ -26,6 +26,7 @@ fun invert(arr){
 		i = i-1;
 	}
 
+
 	return new_arr;
 }
 

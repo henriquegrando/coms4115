@@ -18,9 +18,6 @@ DAMPLC="./dampl"
 # Test files
 files="tests/*.mpl"
 
-declare -i fail=0
-declare -i success=0
-
 Greetings() {
 	echo ""
 	echo "\t/*DaMPL Automated Test Script */"

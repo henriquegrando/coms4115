@@ -43,7 +43,7 @@ do
 	eval "$DAMPLC" "${file}" ">" "${filename}.c" "2> ./tests/temp.out"
 
 	if [ -s ./tests/temp.out ]; then
-    	echo "File with error, aborting test ..."
+    	echo "Compile time error, aborting test ..."
 
     	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
 
@@ -56,7 +56,7 @@ do
 		eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
 
 		echo "Testing the generated file ..."
-		./${filename} > ./tests/temp.out
+		./${filename} > ./tests/temp.out 2>&1
 
 		diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
 

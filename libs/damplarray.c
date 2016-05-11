@@ -1015,8 +1015,8 @@ Array dampl_arr_get_range__tup (Array this, int index1, int index2){
     return arr;
 }
 
-/*
-Tuple dampl_tup_convert(Array arr, int size, type_map type){
+
+Tuple dampl_tup_convert(Array arr, int size, type_map* type){
     int i;
 
     if(arr->size != size){
@@ -1031,4 +1031,4 @@ Tuple dampl_tup_convert(Array arr, int size, type_map type){
     }
     
     return tup;
-}*/
+}

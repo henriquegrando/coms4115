@@ -10,8 +10,7 @@ let remove_quotes str =
   String.sub str 1 ((String.length str)-2)
 
 let get_file_from_include incl = (!basepath)^(match incl with
-    StdIncl(name) -> ""
-  | FileIncl(f) -> remove_quotes f
+  FileIncl(f) -> remove_quotes f
 )
 
 let rec join_ast_list l = match l with

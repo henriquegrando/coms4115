@@ -6,8 +6,6 @@ module StringMap = Map.Make(String);;
 
 type typed_id = typ * string
 
-(* type sem_tup = string * typed_id list *)
-
 type sem_obj = (* lhs *)
     SId of string
   | SBrac of (* a[0] a[i] a[i+1] *)
@@ -67,11 +65,6 @@ type sem_func_decl = {
     sembody : sem_stmt list;
   }
 
-(*
-type program_stmt =
-    Func of func_decl
-  | Stmt of stmt
-*)
 
 type sem_program =
   typed_id list *

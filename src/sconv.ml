@@ -668,7 +668,24 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
         [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
           let tstr = Codegen.simple_string_of_typ typ in
           SSpecialCall(Void,"dampl_print_arr__"^tstr,semexprs@[(SLiteral(dim))])
-       | _ -> SNoexpr
+      | [Tuple(name)] -> 
+          SSpecialCall(Void,"dampl_print__tup",semexprs)
+      | _ -> SNoexpr
+  )
+  | "str" -> (
+      let rec get_array_dimension_and_type arr n = ( match arr with
+          Array(t) -> get_array_dimension_and_type t (n+1)
+        | t -> (n,t)
+        ) in
+      let semexprs = convert_exprs exprs in
+      let typs = List.map get_expr_typ semexprs in
+      match typs with
+        [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
+          let tstr = Codegen.simple_string_of_typ typ in
+          SSpecialCall(String,"dampl_str_arr__"^tstr,semexprs@[(SLiteral(dim))])
+      | [Tuple(name)] -> 
+          SSpecialCall(String,"dampl_str__tup",semexprs)
+      | _ -> SNoexpr
   )
 
   | _ -> SNoexpr (* No special behavior *)

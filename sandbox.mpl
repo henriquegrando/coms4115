@@ -1,8 +1,5 @@
 tuple Group {name, age:integer, year:integer, grade, position}
 
-print(args);
-die();
-
 
 fun readCSV(filename){
 	file = readfile(filename);
@@ -178,7 +175,7 @@ fun print_array_2d(arr){
 
 	*/
 
-	
+	/*
 	a=Group;
 
 	a$name = "Name";
@@ -190,7 +187,7 @@ fun print_array_2d(arr){
 	print(a$name);
 	print("\n");
 	print(a$age + 5);
-	print("\n");
+	print("\n");*/
 /*
 	print(a$(0));
 	print("\n");
@@ -235,4 +232,9 @@ fun print_array_2d(arr){
 	ab = tab$year;
 	print(ab[0]);
 	print("\n");
+	*/
+/*
+	str = readfile("helloworld.c");
+
+	writefile("out.txt",str);
 	*/

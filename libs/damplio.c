@@ -243,7 +243,6 @@ void arr_ensure_cap__file (int sz){
 
 void arr_append__file (FILE* value){
 
-
     arr_ensure_cap__file (files->size + 1);
 
     ((FILE**)files->a)[files->size++] = value;
@@ -279,6 +278,11 @@ void dampl_close_file(int index){
   
   FILE* fp;
   
+  if (index >= files->size || index < 0){
+    fprintf(stderr, "Illegal file descriptor\n");
+    exit(1);
+  }
+  
   fp = (FILE*) arr_get__file (index);
   
   fclose(fp);
@@ -293,6 +297,11 @@ String dampl_readline(int index){
   
   int eof_flag = 1;
   int count = 0;
+
+  if (index >= files->size || index < 0){
+    fprintf(stderr, "Illegal file descriptor\n");
+    exit(1);
+  }
 
   fp = (FILE*) arr_get__file (index);
   
@@ -327,6 +336,12 @@ String dampl_readline(int index){
 void dampl_writestring(int index, String str){
   
   FILE* fp;
+
+  if (index >= files->size || index < 0){
+    fprintf(stderr, "Illegal file descriptor\n");
+    exit(1);
+  }
+
 
   fp = (FILE*) arr_get__file (index);
   

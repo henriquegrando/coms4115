@@ -38,12 +38,12 @@ void dampl_writefile__str_str (String, String);
 
 void dampl_file_constructor();
 
-int dampl_open_file(String, String);
+int dampl_open__str_str(String, String);
 
-void dampl_close_file(int);
+void dampl_close__int(int);
 
-String dampl_readline(int);
+String dampl_readline__int(int);
 
-void dampl_writestring(int, String);
+void dampl_writeline__int_String(int, String);
 
 #endif

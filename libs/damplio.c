@@ -133,7 +133,6 @@ void dampl_print__tup (Tuple tup){
 }
 
 
-
 Array dampl_strsplit__str_str (String str, String separator){
 	Array arr = dampl_arr_new();
 
@@ -152,8 +151,6 @@ Array dampl_strsplit__str_str (String str, String separator){
 
 	return arr;
 }
-
-
 
 
 // File Functions
@@ -259,7 +256,7 @@ FILE *arr_get__file (int index){
     return  ((FILE **) files->a)[index];
 }
 
-int dampl_open_file(String filename,String mode){
+int dampl_open__str_str(String filename,String mode){
 
   FILE **fp = malloc(sizeof(FILE*));
 
@@ -274,7 +271,7 @@ int dampl_open_file(String filename,String mode){
   return files->size-1;
 }
 
-void dampl_close_file(int index){
+void dampl_close__int(int index){
   
   FILE* fp;
   
@@ -288,7 +285,7 @@ void dampl_close_file(int index){
   fclose(fp);
 }
 
-String dampl_readline(int index){
+String dampl_readline__int(int index){
   char c;
   int i;
   FILE* fp;
@@ -333,7 +330,7 @@ String dampl_readline(int index){
   return file_str;
 }
 
-void dampl_writestring(int index, String str){
+void dampl_writeline__int_String(int index, String str){
   
   FILE* fp;
 

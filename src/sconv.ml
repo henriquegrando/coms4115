@@ -121,6 +121,16 @@ let is_array (typ : typ) : bool =
     Array(_) -> true
   | _ -> false
 
+let is_tuple (typ : typ) : bool =
+  match typ with
+    Tuple(_) -> true
+  | _ -> false
+
+let get_tuple_name (typ : typ) : string =
+  match typ with
+    Tuple(t) -> t
+  | _ -> ""
+
 let rec is_array_of_undefined typ = match typ with
     Array(t) -> is_array_of_undefined t
   | Undefined -> true
@@ -566,6 +576,12 @@ and convert_assign o e = (
       else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
         then ( add_id_to_map globals semobj expr_typ;
         SAssign(expr_typ,semobj, semexpr) )
+      else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+        let tupname = (get_tuple_name expectedtyp) in
+        let tupsize = StringMap.find tupname !tup_sizes in 
+        let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+        SAssign(expr_typ,semobj,newexp)
       else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
     ) else ( add_id_to_map globals semobj expr_typ; 
     SAssign(expr_typ,semobj, semexpr)
@@ -590,6 +606,12 @@ and convert_assign o e = (
       else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
         then ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
         SAssign(expr_typ,semobj, semexpr) )
+      else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+        let tupname = (get_tuple_name expectedtyp) in
+        let tupsize = StringMap.find tupname !tup_sizes in 
+        let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+        SAssign(expr_typ,semobj,newexp)
       else raise(Failure("cant change var "^(get_string_of_sem_obj semobj)^" type"))
     ) else (
       (* check if it is a global *)
@@ -607,8 +629,14 @@ and convert_assign o e = (
           then ( add_id_to_map globals semobj expr_typ;
           SAssign(expr_typ,semobj, semexpr) )
         else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
-         then ( add_id_to_map globals semobj expr_typ;
-         SAssign(expr_typ,semobj, semexpr) )
+          then ( add_id_to_map globals semobj expr_typ;
+          SAssign(expr_typ,semobj, semexpr) )
+        else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+          let tupname = (get_tuple_name expectedtyp) in
+          let tupsize = StringMap.find tupname !tup_sizes in 
+          let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+          let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+          SAssign(expr_typ,semobj,newexp)
         else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
         (* if not local or global, create new local var *)
       ) else ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;

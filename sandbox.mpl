@@ -1,5 +1,8 @@
 tuple Group {name, age:integer, year:integer, grade, position}
 
+t=Group[];
+t[]=["a","1","1","a","a"];
+
 
 fun readCSV(filename){
 	file = readfile(filename);

@@ -185,7 +185,7 @@ let rec string_of_stmt = function
       ^ string_of_typ t ^ " dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(0);\n"
       ^ "int i_"^str ^ " = 0;\n"
       ^ "for (;"
-        ^"i_"^str^" < dampl_arr_size(" ^ string_of_expr e ^ ");"
+        ^"i_"^str^" < dampl_arr_len(" ^ string_of_expr e ^ ");"
         ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(++i_"^str ^ ")"
       ^")\n"^string_of_stmt s^"}\n"
   

@@ -122,15 +122,15 @@ Array dampl_arr_concat__tup (Array, Array);
 
 /* Set Range Functions */
 
-Array dampl_arr_set_range__arr (Array, Array, int, int);
+Array dampl_arr_set_range__arr (Array, int, int, Array);
 
-Array dampl_arr_set_range__int (Array, Array, int, int);
+Array dampl_arr_set_range__int (Array, int, int, Array);
 
-Array dampl_arr_set_range__float (Array, Array, int, int);
+Array dampl_arr_set_range__float (Array, int, int, Array);
 
-Array dampl_arr_set_range__str (Array, Array, int, int);
+Array dampl_arr_set_range__str (Array, int, int, Array);
 
-Array dampl_arr_set_range__tup (Array, Array, int, int);
+Array dampl_arr_set_range__tup (Array, int, int, Array);
 
 
 /* Get Range Functions */

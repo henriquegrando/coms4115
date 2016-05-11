@@ -13,6 +13,6 @@ String dampl_str__float (float f);
 
 String dampl_str__int (int i);
 
-void die(void);
+void dampl_die__(void);
 
 #endif

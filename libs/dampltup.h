@@ -19,7 +19,8 @@ typedef struct
 } * Tuple;
 
 
-Tuple dampl_tup_new (int size, type_map);
+//Tuple dampl_tup_new (int size, type_map);
+Tuple dampl_tup_new (int size);
 
 
 /* Length function */

@@ -7,6 +7,6 @@ project:
 
 .PHONY: clean
 clean:
-	rm -f *.c hello dampl
+	rm -f *.c hello dampl sandbox
 	cd src; make clean
 	cd libs; make clean

@@ -1,4 +1,4 @@
-(* Abstract Syntax Tree and functions for printing it *)
+(* Abstract Syntax Tree *)
 
 
 type typ = Undefined | Bool | Int | Float | Void | String | Tuple of string | Table of string | Array of typ

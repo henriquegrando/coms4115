@@ -668,7 +668,7 @@ int get_end(int index2, int size){
     return end;
 }
 
-Array dampl_arr_set_range__arr (Array this, Array other, int index1, int index2){
+Array dampl_arr_set_range__arr (Array this, int index1, int index2, Array other){
     int i;
     int begin, end;
 
@@ -701,14 +701,19 @@ Array dampl_arr_set_range__arr (Array this, Array other, int index1, int index2)
         dampl_arr_append__arr (arr, dampl_arr_get__arr (this, i));
     }
 
-    return arr;
+    this->a = arr->a;
+    this->size = arr->size;
+    this->capacity = arr->capacity;
+
+    return this;
 }
 
-Array dampl_arr_set_range__int (Array this, Array other, int index1, int index2){
+Array dampl_arr_set_range__int (Array this, int index1, int index2, Array other){
     int i;
     int begin, end;
 
     begin = get_begin(index1, this->size);
+
     end = get_end(index2, this->size);
 
     if(end < begin){
@@ -737,10 +742,14 @@ Array dampl_arr_set_range__int (Array this, Array other, int index1, int index2)
         dampl_arr_append__int (arr, dampl_arr_get__int (this, i));
     }
 
-    return arr;
+    this->a = arr->a;
+    this->size = arr->size;
+    this->capacity = arr->capacity;
+
+    return this;
 }
 
-Array dampl_arr_set_range__float (Array this, Array other, int index1, int index2){
+Array dampl_arr_set_range__float (Array this, int index1, int index2, Array other){
     int i;
     int begin, end;
 
@@ -773,10 +782,15 @@ Array dampl_arr_set_range__float (Array this, Array other, int index1, int index
         dampl_arr_append__float (arr, dampl_arr_get__float (this, i));
     }
 
-    return arr;
+        
+    this->a = arr->a;
+    this->size = arr->size;
+    this->capacity = arr->capacity;
+
+    return this;
 }
 
-Array dampl_arr_set_range__str (Array this, Array other, int index1, int index2){
+Array dampl_arr_set_range__str (Array this, int index1, int index2, Array other){
     int i;
     int begin, end;
 
@@ -809,10 +823,15 @@ Array dampl_arr_set_range__str (Array this, Array other, int index1, int index2)
         dampl_arr_append__str (arr, dampl_arr_get__str (this, i));
     }
 
-    return arr;
+        
+    this->a = arr->a;
+    this->size = arr->size;
+    this->capacity = arr->capacity;
+
+    return this;
 }
 
-Array dampl_arr_set_range__tup (Array this, Array other, int index1, int index2){
+Array dampl_arr_set_range__tup (Array this, int index1, int index2, Array other){
     int i;
     int begin, end;
 
@@ -845,7 +864,12 @@ Array dampl_arr_set_range__tup (Array this, Array other, int index1, int index2)
         dampl_arr_append__tup (arr, dampl_arr_get__tup (this, i));
     }
 
-    return arr;
+        
+    this->a = arr->a;
+    this->size = arr->size;
+    this->capacity = arr->capacity;
+
+    return this;
 }
 
 
@@ -991,6 +1015,7 @@ Array dampl_arr_get_range__tup (Array this, int index1, int index2){
     return arr;
 }
 
+/*
 Tuple dampl_tup_convert(Array arr, int size, type_map type){
     int i;
 
@@ -1006,4 +1031,4 @@ Tuple dampl_tup_convert(Array arr, int size, type_map type){
     }
     
     return tup;
-}
+}*/

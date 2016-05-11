@@ -29,7 +29,7 @@ void dampl_arr_print__tup (Array, int);
 void dampl_print__tup (Tuple);
 
 
-Array dampl_strsplit__str (String, String);
+Array dampl_strsplit__str_str (String, String);
 
 String dampl_readfile__str (String);
 

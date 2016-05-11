@@ -1,4 +1,4 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for DaMPL *)
 
 { open Parser }
 
@@ -6,7 +6,6 @@
 let digit = ['0'-'9']
 let exponent = ['e' 'E']['+' '-']?digit+
 let decimal = (digit+"."digit*)|(digit*"."digit+)
-let floatn =  (decimal exponent?)|(digit+exponent)
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)

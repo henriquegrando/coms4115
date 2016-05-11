@@ -30,11 +30,10 @@ let built_in_prototypes = [
     [String]
   ]);
   (Array(String),"strsplit",[
-    [String]
+    [String;String]
   ]);
   (Void,"writefile",[
-    [String];
-    [String];
+    [String;String];
   ]);
 ];;
 

@@ -20,6 +20,6 @@ String dampl_str__int (int i) {
 	return s;
 }
 
-void die(void) {
+void dampl_die__(void) {
 	exit(0);
 }

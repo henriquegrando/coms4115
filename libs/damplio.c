@@ -130,7 +130,7 @@ void dampl_print__tup (Tuple tup){
 
 
 
-Array dampl_strsplit__str (String str, String separator){
+Array dampl_strsplit__str_str (String str, String separator){
 	Array arr = dampl_arr_new();
 
 	char *token;
@@ -151,18 +151,18 @@ Array dampl_strsplit__str (String str, String separator){
 
 String dampl_readfile__str (String file_name){
 	FILE *fp;
-   	int i, count;
-   	char c;
+ 	int i, count;
+ 	char c;
 
-   	/* opening file for reading */
-   	fp = fopen(file_name, "r");
-   	if(fp == NULL) {
-		perror("Error opening file");
-      	exit(-1);
-   	}
+ 	/* opening file for reading */
+ 	fp = fopen(file_name, "r");
+ 	if(fp == NULL) {
+	perror("Error opening file");
+    	exit(-1);
+ 	}
 
-   	/* Counts the number of characters on file */
-   	count = 0;
+ 	/* Counts the number of characters on file */
+ 	count = 0;
 	while(fgetc(fp) != EOF){
 		count++;
 	}

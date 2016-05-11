@@ -61,7 +61,7 @@ let mapping_of_tup (t : tup) : string =
     | Float -> "real"
     | Int -> "integer"
     | _ -> raise(Failure("tuple mapping failure")) ) in
-  "type_map map"^fst t^" = {"
+  "type_map map"^fst t^"[] = {"
     ^(String.concat ", " (List.map string_of_attr_type (snd t)))^"};\n"
 
 let rec string_of_obj = function
@@ -181,7 +181,7 @@ and string_of_expr = function
   | SString(s) -> s
 
 
-let rec string_of_stmt = function
+and string_of_stmt = function
     SBlock(stmts) ->
       "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
   | SExpr(expr) -> string_of_expr expr ^ ";\n";
@@ -193,10 +193,10 @@ let rec string_of_stmt = function
   | SFor(str,t, e, s) -> "{\n"
       ^ string_of_typ t ^ " dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(0);\n"
       ^ "int i_"^str ^ " = 0;\n"
-      ^ "for (;"
-        ^"i_"^str^" < dampl_arr_len(" ^ string_of_expr e ^ ");"
-        ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(++i_"^str ^ ")"
-      ^")\n"^string_of_stmt s^"}\n"
+      ^ "while(i_"^str^" < dampl_arr_len(" ^ string_of_expr e ^ ") ) {\n" 
+        ^"dampl_"^str^" = dampl_arr_get__"^simple_string_of_typ t^"(i_"^str ^ ");\n"
+      ^string_of_stmts ( match s with SBlock(sl) -> sl | stmt -> [stmt] )
+      ^"i_"^str^"++;\n}\n"
   
      (* "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s
@@ -204,6 +204,9 @@ let rec string_of_stmt = function
   | SWhile(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | SBreak -> "break;\n"
   | SContinue -> "continue;\n"
+
+and string_of_stmts stmts =
+  String.concat "" (List.map string_of_stmt stmts)
 
 
 let string_of_vdecl (id, t) = string_of_typ t ^ " dampl_" ^ id ^ ";\n"

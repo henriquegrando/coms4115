@@ -121,6 +121,16 @@ let is_array (typ : typ) : bool =
     Array(_) -> true
   | _ -> false
 
+let is_tuple (typ : typ) : bool =
+  match typ with
+    Tuple(_) -> true
+  | _ -> false
+
+let get_tuple_name (typ : typ) : string =
+  match typ with
+    Tuple(t) -> t
+  | _ -> ""
+
 let rec is_array_of_undefined typ = match typ with
     Array(t) -> is_array_of_undefined t
   | Undefined -> true
@@ -566,6 +576,12 @@ and convert_assign o e = (
       else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
         then ( add_id_to_map globals semobj expr_typ;
         SAssign(expr_typ,semobj, semexpr) )
+      else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+        let tupname = (get_tuple_name expectedtyp) in
+        let tupsize = StringMap.find tupname !tup_sizes in 
+        let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+        SAssign(expr_typ,semobj,newexp)
       else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
     ) else ( add_id_to_map globals semobj expr_typ; 
     SAssign(expr_typ,semobj, semexpr)
@@ -590,6 +606,12 @@ and convert_assign o e = (
       else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
         then ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
         SAssign(expr_typ,semobj, semexpr) )
+      else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+        let tupname = (get_tuple_name expectedtyp) in
+        let tupsize = StringMap.find tupname !tup_sizes in 
+        let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+        let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+        SAssign(expr_typ,semobj,newexp)
       else raise(Failure("cant change var "^(get_string_of_sem_obj semobj)^" type"))
     ) else (
       (* check if it is a global *)
@@ -607,8 +629,14 @@ and convert_assign o e = (
           then ( add_id_to_map globals semobj expr_typ;
           SAssign(expr_typ,semobj, semexpr) )
         else if(is_collection_range_access(semobj) && expectedtyp = (Array(Undefined)) && (is_array expr_typ))
-         then ( add_id_to_map globals semobj expr_typ;
-         SAssign(expr_typ,semobj, semexpr) )
+          then ( add_id_to_map globals semobj expr_typ;
+          SAssign(expr_typ,semobj, semexpr) )
+        else if ( is_tuple expectedtyp && expr_typ = (Array(String)) ) then
+          let tupname = (get_tuple_name expectedtyp) in
+          let tupsize = StringMap.find tupname !tup_sizes in 
+          let params = [semexpr;SLiteral(tupsize);SString("map"^tupname)] in
+          let newexp = (SSpecialCall(Tuple(""),"dampl_tup_convert",params)) in
+          SAssign(expr_typ,semobj,newexp)
         else raise(Failure("cant change global "^(get_string_of_sem_obj semobj)^" type"))
         (* if not local or global, create new local var *)
       ) else ( add_id_to_map (semfdecl.semlocals) semobj expr_typ;
@@ -640,7 +668,24 @@ and handle_special_function (name : string) (exprs : expr list) : sem_expr =
         [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
           let tstr = Codegen.simple_string_of_typ typ in
           SSpecialCall(Void,"dampl_print_arr__"^tstr,semexprs@[(SLiteral(dim))])
-       | _ -> SNoexpr
+      | [Tuple(name)] -> 
+          SSpecialCall(Void,"dampl_print__tup",semexprs)
+      | _ -> SNoexpr
+  )
+  | "str" -> (
+      let rec get_array_dimension_and_type arr n = ( match arr with
+          Array(t) -> get_array_dimension_and_type t (n+1)
+        | t -> (n,t)
+        ) in
+      let semexprs = convert_exprs exprs in
+      let typs = List.map get_expr_typ semexprs in
+      match typs with
+        [Array(t)] -> let dim,typ = get_array_dimension_and_type (Array(t)) 0 in
+          let tstr = Codegen.simple_string_of_typ typ in
+          SSpecialCall(String,"dampl_str_arr__"^tstr,semexprs@[(SLiteral(dim))])
+      | [Tuple(name)] -> 
+          SSpecialCall(String,"dampl_str__tup",semexprs)
+      | _ -> SNoexpr
   )
 
   | _ -> SNoexpr (* No special behavior *)

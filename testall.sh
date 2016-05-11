@@ -35,10 +35,16 @@ files="tests/*.mpl"
 
 for file in $files
 do
+	echo ""
+
 	filename="${file%.*}"
+	echo "File: \"${file}\""
+	echo "Compiling from .mpl to .c ..."
 	eval "$DAMPLC" "<" "${file}" ">" "${filename}.c"
+	echo "Generating the executable file ..."
 	eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
 
+	echo "Executing the generated file ..."
 	./${filename} > ./tests/temp.out
 
 	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1

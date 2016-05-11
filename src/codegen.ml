@@ -239,6 +239,6 @@ let string_of_program (globals, statements, functions, tuples) =
   String.concat "" (List.map fdecl_prototype functions) ^ "\n" ^
   String.concat "" (List.map string_of_fdecl functions) ^
   "int main(int argc,char** argv){\n" ^
-  "args=build_args_array(argv);\n" ^
+  "dampl_args=build_args_array(argv);\n" ^
   String.concat "" (List.map string_of_stmt statements) ^ 
   "return 0;\n}\n"

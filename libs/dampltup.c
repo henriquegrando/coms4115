@@ -69,7 +69,7 @@ float dampl_tup_set__float(Tuple tup, int index, float data){
 
 	char str[64];
 
-	sprintf(str, "%f", data);
+	sprintf(str, "%g", data);
 
 	tup->values[index] = dampl_str_copy(str);
 

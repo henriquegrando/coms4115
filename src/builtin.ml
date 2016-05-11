@@ -35,16 +35,16 @@ let built_in_prototypes = [
   (Void,"writefile",[
     [String;String];
   ]);
-  (Int,"openfile",[
+  (Int,"open",[
     [String;String];
   ]);
-  (Void,"closefile",[
+  (Void,"close",[
     [Int];
   ]);
   (String,"readline",[
     [Int];
   ]);
-  (Void,"writestring",[
+  (Void,"writeline",[
     [Int;String];
   ]);
 ];;

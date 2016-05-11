@@ -146,7 +146,7 @@ Array dampl_arr_get_range__str (Array, int, int);
 Array dampl_arr_get_range__tup (Array, int, int);
 
 
-Tuple dampl_tup_convert(Array, int, type_map);
+Tuple dampl_tup_convert(Array, int, type_map*);
 
 
 #endif

@@ -2,9 +2,6 @@ fun fact(n) {
 	if( n == 2) {
 		return n;
 	}
-	else {
-		return ( n * fact(n-1) );
-	}
 }
 
-print( fact(6) );
+fact(2);

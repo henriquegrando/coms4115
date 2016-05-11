@@ -46,11 +46,17 @@ Test() {
 		echo "Compiling from .mpl to .c ..."
 		eval "$DAMPLC" "${file}" ">" "${filename}.c" "2> ./tests/temp.out"
 
-		if [ -s ./tests/temp.out ]; then
+		if [ -s ./tests/temp.out ]
+		then
 	    	echo "Compile time error detected ..."
 
 	    	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
 			rm ./tests/temp.out
+
+			if [ -s ${filename}.diff ]
+			then
+				echo "WARNING: Output differs from expected."
+			fi
 	    	
 	    	echo "Done."
 	    	continue

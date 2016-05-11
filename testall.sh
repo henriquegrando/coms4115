@@ -40,15 +40,26 @@ do
 	filename="${file%.*}"
 	echo "File: \"${file}\""
 	echo "Compiling from .mpl to .c ..."
-	eval "$DAMPLC" "<" "${file}" ">" "${filename}.c"
-	echo "Generating the executable file ..."
-	eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
+	eval "$DAMPLC" "${file}" ">" "${filename}.c" "2> ./tests/temp.out"
 
-	echo "Executing the generated file ..."
-	./${filename} > ./tests/temp.out
+	if [ -s ./tests/temp.out ]; then
+    	echo "File with error, aborting test ..."
 
-	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
+    	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
 
-	rm ./tests/temp.out
-	rm ${filename}
+		rm ./tests/temp.out
+    	
+    	continue
+	else 
+		echo "Generating the executable file ..."
+		eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
+
+		echo "Testing the generated file ..."
+		./${filename} > ./tests/temp.out
+
+		diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
+
+		rm ./tests/temp.out
+		rm ${filename}
+	fi
 done

@@ -15,7 +15,20 @@ LDLIB="-ldampllib"
 # DaMPL compiler.
 DAMPLC="./dampl"
 
+# Test files
+files="tests/*.mpl"
+
+declare -i fail=0
+declare -i success=0
+
+Greetings() {
+	echo ""
+	echo "\t/*DaMPL Automated Test Script */"
+}
+
 Build() {
+	echo ""
+	echo "Building the DaMPL Compiler ..."
 	cd src &&
 	make &&
 	cp dampl ../dampl 
@@ -23,32 +36,47 @@ Build() {
 	cd libs &&
 	make &&
 	cd ..
+	echo "Done."
+}
+
+Test() {
+	for file in $files
+	do
+		echo ""
+
+		filename="${file%.*}"
+		echo "File: \"${file}\""
+		echo "Compiling from .mpl to .c ..."
+		eval "$DAMPLC" "${file}" ">" "${filename}.c" "2> ./tests/temp.out"
+
+		if [ -s ./tests/temp.out ]; then
+	    	echo "Compile time error detected ..."
+
+	    	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
+			rm ./tests/temp.out
+	    	
+	    	echo "Done."
+	    	continue
+		else 
+			echo "Generating the executable file ..."
+			eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
+
+			echo "Testing the generated file ..."
+			./${filename} > ./tests/temp.out 2>&1
+
+			diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
+
+			rm ./tests/temp.out
+			rm ${filename}
+
+			echo "Done."
+		fi
+	done
 }
 
 # Main #
 
 # Builds the compiler
+Greetings
 Build
-
-# Test files
-files="tests/*.mpl"
-
-for file in $files
-do
-	echo ""
-
-	filename="${file%.*}"
-	echo "File: \"${file}\""
-	echo "Compiling from .mpl to .c ..."
-	eval "$DAMPLC" "<" "${file}" ">" "${filename}.c"
-	echo "Generating the executable file ..."
-	eval "$GCC" "-o" "${filename}" "${filename}.c" "$CFLAG" "$LDFLAG" "$LDLIB"
-
-	echo "Executing the generated file ..."
-	./${filename} > ./tests/temp.out
-
-	diff -b ${filename}.out ./tests/temp.out > ${filename}.diff 2>&1
-
-	rm ./tests/temp.out
-	rm ${filename}
-done
+Test

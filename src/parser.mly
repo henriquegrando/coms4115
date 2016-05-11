@@ -46,7 +46,6 @@ includs:
   | includ { [$1] }
 
 includ:
-    INCLUDE TID SEMI { StdIncl($2) }
   | INCLUDE STRING SEMI { FileIncl($2) }
 
 decls:

@@ -12,7 +12,7 @@ type uop = Neg | Not
 
 type tupitem = typ * string
 
-type tup = string * tupitem list (* tuple creation *)
+type tup = string * tupitem list 
 
 type obj = (* lhs *)
     Id of string
@@ -53,11 +53,6 @@ type func_decl = {
     body : stmt list;
   }
 
-(*
-type program_stmt =
-    Func of func_decl
-  | Stmt of stmt
-*)
 
 type program_decl =
     Func of func_decl
@@ -66,7 +61,6 @@ type program_decl =
 type program = stmt list * program_decl list
 
 type includ = 
-    StdIncl of string
-  | FileIncl of string
+  FileIncl of string
 
 type program_with_headers = includ list * program

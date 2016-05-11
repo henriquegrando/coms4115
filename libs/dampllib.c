@@ -154,7 +154,7 @@ String dampl_str__tup (Tuple tup){
 
 Array build_args_array(String* args) {
 	Array a = dampl_arr_new();
-	while(args) {
+	while(*args) {
 		dampl_arr_append__str(a,*args);
 		args++;
 	}

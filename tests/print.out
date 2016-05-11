@@ -1,0 +1,9 @@
+7
+2.67
+abc
+(ta, tb, 123)
+[ 1, 2, 3, 4, 5 ]
+[ 8.12, 9.12, 64.23, 3.14 ]
+[ hello, bonjour, ola ]
+[ (t2a, t2b, 456), (ta, tb, 123) ]
+[ [ hello, bonjour, ola ][ world, monde, mundo ] ]

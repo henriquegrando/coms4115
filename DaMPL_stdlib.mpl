@@ -2,10 +2,6 @@ fun readCSV(filename){
 	file = readfile(filename);
 	table = strsplit(file,"\n");
 
-	tup = Tuple (name, uni)
-
-	table = tup[];
-
 	for i in table{
 		new_table[] = strsplit(i,",");
 	}
@@ -28,19 +24,6 @@ fun join(arr, separator){
 
 	return new_str;
 }
-
-fun string_of_tuple(tup,separator){
-	str = tup$(0);
-
-	i = 1;
-	while(i < len(tup)){
-		str = str + separator + tup$(i) ;
-		i = i+1;
-	}
-
-	return str;
-}
-
 
 fun writeCSV(table,file){
 	str = "";

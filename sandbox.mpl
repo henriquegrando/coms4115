@@ -145,7 +145,6 @@ fun print_array_2d(arr){
 }
 
 
-fun main(){
 	/*
 	a = [ ["1","2"],["3","4"],["5","3"],["1","5","6"],["9"] ];
 	print(len(a[0]));
@@ -176,11 +175,11 @@ fun main(){
 
 	*/
 
-	/*
+	
 	a=Group;
 
 	a$name = "Name";
-	a$age = 25;
+	a$(1) = "oi";
 	a$year = 1995;
 	a$grade = "A";
 	a$position = "unemployed";
@@ -189,12 +188,12 @@ fun main(){
 	print("\n");
 	print(a$age + 5);
 	print("\n");
-
+/*
 	print(a$(0));
 	print("\n");
 
 	print(string_of_tuple(a," ")+"\n");
-*/
+
 	a=Group;
 	tab = Group[];
 
@@ -233,6 +232,4 @@ fun main(){
 	ab = tab$year;
 	print(ab[0]);
 	print("\n");
-}
-
-main();
+	*/

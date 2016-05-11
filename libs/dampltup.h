@@ -9,7 +9,7 @@ typedef enum{
 	real,
 	integer,
 	text
-} * type_map;
+} type_map;
 
 typedef struct
 {
@@ -20,7 +20,7 @@ typedef struct
 
 
 //Tuple dampl_tup_new (int size, type_map);
-Tuple dampl_tup_new (int size);
+Tuple dampl_tup_new (int size, type_map* type);
 
 
 /* Length function */

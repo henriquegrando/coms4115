@@ -13,6 +13,18 @@ String dampl_str__float (float f);
 
 String dampl_str__int (int i);
 
+
+String dampl_str_arr__int (Array, int);
+
+String dampl_str_arr__float (Array, int);
+
+String dampl_str_arr__str (Array, int);
+
+String dampl_str_arr__tup (Array, int);
+
+String dampl_str__tup (Tuple);
+
+
 void dampl_die__(void);
 
 #endif

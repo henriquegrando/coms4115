@@ -30,11 +30,11 @@ fun join(arr, separator){
 }
 
 fun string_of_tuple(tup,separator){
-	str = "";
+	str = tup$(0);
 
-	i = 0;
+	i = 1;
 	while(i < len(tup)){
-		str = str + tup$(i) + separator;
+		str = str + separator + tup$(i) ;
 		i = i+1;
 	}
 

@@ -35,4 +35,15 @@ String dampl_readfile__str (String);
 
 void dampl_writefile__str_str (String, String);
 
+
+void dampl_file_constructor();
+
+int dampl_open_file(String, String);
+
+void dampl_close_file(int);
+
+String dampl_readline(int);
+
+void dampl_writestring(int, String);
+
 #endif

@@ -35,6 +35,18 @@ let built_in_prototypes = [
   (Void,"writefile",[
     [String;String];
   ]);
+  (Int,"openfile",[
+    [String;String];
+  ]);
+  (Void,"closefile",[
+    [Int];
+  ]);
+  (String,"readline",[
+    [Int];
+  ]);
+  (Void,"writestring",[
+    [Int;String];
+  ]);
 ];;
 
 let get_built_in_rtyp = function

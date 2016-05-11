@@ -13,7 +13,9 @@ typedef struct
     void * a;
     int size;
     int capacity;
-} * Array;
+} tp_array_struct;
+
+typedef tp_array_struct * Array;
 
 /* Array constructor for every type */
 

@@ -2,10 +2,15 @@ include "DaMPL_stdlib.mpl";
 
 tuple Report {cdatetime, address,district:integer,beat,grid:integer,crimedescr,ucr_ncic_code:integer, latitude:real,longitude:real}
 
+print("hi");
 
 tab = Report[];
 
+
+
 readCSV("SacramentocrimeJanuary2006.csv", tab);
+
+
 
 tab = tab[1:];
 
@@ -17,6 +22,8 @@ size = len(arr);
 i = 0;
 
 writefile("out.txt",join(arr, "\n"));
+
+
 
 while (i<size){
 	arr[i] = str(i);

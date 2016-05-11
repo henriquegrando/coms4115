@@ -6,7 +6,7 @@
 
 Array dampl_arr_new()
 {
-    Array arr = (Array) malloc (sizeof(Array*));
+    Array arr = (Array) malloc (sizeof(tp_array_struct));
     arr->a = NULL;
     arr->size = 0;
     arr->capacity = 0;
@@ -312,7 +312,7 @@ Tuple dampl_arr_get__tup (Array this, int index)
 Array dampl_arr_extract_attr__int(Array table, int column){
     int i, data;
 
-    Array arr = (Array) malloc (sizeof(Array*));
+    Array arr = (Array) malloc (sizeof(tp_array_struct));
     arr->a = malloc(table->size*(sizeof(int)));
     arr->size = 0;
     arr->capacity = table->size;
@@ -330,7 +330,7 @@ Array dampl_arr_extract_attr__float(Array table, int column){
     int i;
     float data;
 
-    Array arr = (Array) malloc (sizeof(Array*));
+    Array arr = (Array) malloc (sizeof(tp_array_struct));
     arr->a = malloc(table->size*(sizeof(float)));
     arr->size = 0;
     arr->capacity = table->size;
@@ -347,7 +347,7 @@ Array dampl_arr_extract_attr__str(Array table, int column){
     int i;
     String data;
 
-    Array arr = (Array) malloc (sizeof(Array*));
+    Array arr = (Array) malloc (sizeof(tp_array_struct));
     arr->a = malloc(table->size*(sizeof(String)));
     arr->size = 0;
     arr->capacity = table->size;

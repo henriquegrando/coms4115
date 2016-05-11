@@ -5,12 +5,12 @@
 Tuple dampl_tup_new (int size, type_map* type){
 	int i;
 
-	Tuple tup = malloc(sizeof(Tuple*));
+	Tuple tup = malloc(sizeof(tp_tup_struct));
 	tup->size = size;
     tup->map = type;
     
 
-	tup->values = malloc(size*sizeof(String*));
+	tup->values = malloc(size*sizeof(String));
 
 	for(i = 0; i < size; i++){
         switch(type[i]){

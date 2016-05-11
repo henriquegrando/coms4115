@@ -4,6 +4,7 @@
 /* Array structure */
 
 #include "damplstr.h"
+#include <stdlib.h>
 
 typedef enum{
 	real,
@@ -16,7 +17,9 @@ typedef struct
     String* values;
     int size;
     type_map* map;
-} * Tuple;
+} tp_tup_struct;
+
+typedef tp_tup_struct * Tuple;
 
 
 //Tuple dampl_tup_new (int size, type_map);

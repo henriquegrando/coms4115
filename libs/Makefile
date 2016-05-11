@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall
-LDFLAGS = -g
+CFLAGS = -Wall -O2
+LDFLAGS = 
 
 libdamplio.a: damplio.o damplstr.o dampllib.o dampltup.o damplarray.o
 	ar rc libdampllib.a damplio.o damplstr.o dampllib.o dampltup.o damplarray.o
